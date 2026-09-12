@@ -81,6 +81,9 @@ def unpack(raw,password):
     for model in tables():
         columns={c.name for c in model.__table__.columns}
         for row in data['tables'][model.__tablename__]:
+            # v3.0.0 archives predating report names have precisely this one missing column.
+            if model is models.ScrapeJob and isinstance(row, dict) and set(row) == columns - {'title'}:
+                row['title'] = None
             if not isinstance(row,dict) or set(row)!=columns:raise ValueError('Backup schema does not match this version.')
             for c in model.__table__.columns:
                 if isinstance(c.type,DateTime) and row[c.name] is not None:row[c.name]=datetime.fromisoformat(row[c.name])

@@ -87,7 +87,7 @@ export default function SettingsModal() {
 
             {/* Body */}
             <div className="p-5 space-y-5">
-              <ProcessingSettings />
+              <ProcessingSettings localOnly /><a href="/administration" className="text-brand-500 underline">Installation administration</a>
               {/* Scraping section */}
               {caps?.selenium && <div>
                 <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-3">

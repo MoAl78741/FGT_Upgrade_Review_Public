@@ -1,3 +1,6 @@
+import ProcessingSettings from '../components/ProcessingSettings';
+import Account from './Account';
+import Installation from './Installation';
 import {useEffect,useState,type ReactNode} from 'react';
 import {useQuery,useQueryClient} from '@tanstack/react-query';
 import {req} from '../api';
@@ -26,19 +29,22 @@ export default function Administration(){
  if(status.isPending)return <p className="p-8">Checking operator access…</p>;
  if(status.error)return <p role="alert" className="p-8 text-red-400">{status.error.message}</p>;
  if(!authorized)return <main className="max-w-lg mx-auto p-8 space-y-5"><h1 className="text-2xl font-semibold text-white">Installation administration</h1>
-  {privateEdition?<p>Sign in with a private installation administrator account using Account & access. Current account: {team.user?.username||'Not signed in'}.</p>:!status.data?.provisioned?<p>An operator must provision the first account from the host using <code>python -m backend.manage_operator</code>. Public visitor sessions cannot create administrator accounts.</p>:<form className="space-y-4" onSubmit={e=>{e.preventDefault();void run(async()=>{await administrationRequest(status.data?.must_change_password?'/password':'/login','POST',status.data?.must_change_password?{current_password:password,new_password:newPassword}:{username,password});setPassword('');setNewPassword('')},'Signed in.')}}>
+  {privateEdition?<p>Sign in with a Pro installation administrator account using Account & access. Current account: {team.user?.username||'Not signed in'}.</p>:!status.data?.provisioned?<p>An operator must provision the first account from the host using <code>python -m backend.manage_operator</code>. Public visitor sessions cannot create administrator accounts.</p>:<form className="space-y-4" onSubmit={e=>{e.preventDefault();void run(async()=>{await administrationRequest(status.data?.must_change_password?'/password':'/login','POST',status.data?.must_change_password?{current_password:password,new_password:newPassword}:{username,password});setPassword('');setNewPassword('')},'Signed in.')}}>
    <p className="text-gray-300">{status.data?.must_change_password?'Change your initial operator password before continuing.':'Operator-only access. Public reports remain session-isolated.'}</p>
    {!status.data?.must_change_password&&<Field label="Operator username"><input className={field} autoComplete="username" value={username} onChange={e=>setUsername(e.target.value)} required/></Field>}
    <Field label={status.data?.must_change_password?'Current password':'Password'}><input className={field} type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required/></Field>
    {status.data?.must_change_password&&<Field label="New password (14–256 characters)"><input className={field} type="password" minLength={14} maxLength={256} value={newPassword} onChange={e=>setNewPassword(e.target.value)} required/></Field>}
    <button className={button} disabled={busy}>{status.data?.must_change_password?'Change password':'Sign in'}</button>
   </form>}{error&&<p role="alert" className="text-red-400">{error}</p>}</main>;
- const tabs=['Overview','Backup & restore','Certificates',...(privateEdition?['Domains','Access profiles']:[]),'Event logs',...(privateEdition?['Syslog','Email & schedules']:[])];
+ const tabs=['Overview','Backup & restore','Certificates',...(privateEdition?['Domains','Accounts','Access profiles','Processing','Support']:[]),'Event logs',...(privateEdition?['Syslog','Email & schedules']:[])];
  return <div className="max-w-screen-xl mx-auto p-6 space-y-6 text-gray-300"><div className="flex justify-between gap-4"><div><h1 className="text-2xl font-semibold text-white">System administration</h1><p>{privateEdition?'Global installation settings and domain access':'Public operator console · visitor data stays temporary'}</p></div>{!privateEdition&&<button className={button} onClick={()=>void run(()=>administrationRequest('/logout','POST'))}>Sign out operator</button>}</div>
  <nav aria-label="Administration sections" className="flex flex-wrap gap-2">{tabs.map(t=><button key={t} aria-current={tab===t?'page':undefined} className={button+(tab===t?' border-brand-500 bg-navy-700':'')} onClick={()=>{setTab(t);setMessage('');setError('')}}>{t}</button>)}</nav>
  {message&&<p role="status" className="text-emerald-500">{message}</p>}{error&&<p role="alert" className="text-red-400 whitespace-pre-wrap">{error}</p>}{overview.error&&<p role="alert">{overview.error.message}</p>}
  <fieldset disabled={busy} className="space-y-5 disabled:opacity-70">
  {tab==='Overview'&&overview.data&&<section className={panel}><h2 className="text-xl text-white">Installation health</h2><div className="grid sm:grid-cols-3 gap-4"><Metric title="Running build" value={`v${overview.data.version} · ${overview.data.build}`}/><Metric title="Pending email deliveries" value={overview.data.pending_deliveries}/><Metric title="Failed deliveries" value={overview.data.failed_deliveries}/></div><p>Backup scope: {overview.data.backup_scope}.</p><p>Certificate activation: {overview.data.certificate_activation_configured?'Proxy management connected':'Upload/view available; configure the Caddy management connection to activate certificates.'}</p>{overview.data.certificates.filter(c=>c.days_remaining<30).map(c=><p key={c.id} className="text-amber-400">Certificate {c.names.join(', ')} expires in {c.days_remaining} days.</p>)}<p className="text-sm">System operations are restricted to installation administrators. Domain access profiles control report and review workflows. Configuration analysis remains browser-only.</p></section>}
+ {tab==='Accounts'&&<Account/>}
+ {tab==='Processing'&&<ProcessingSettings/>}
+ {tab==='Support'&&<Installation/>}
  {tab==='Backup & restore'&&<Backups run={run} scope={overview.data?.backup_scope||''}/>}
  {tab==='Certificates'&&<Certificates run={run} canActivate={!!overview.data?.certificate_activation_configured}/>}
  {tab==='Domains'&&<Domains run={run} domains={domains.data||[]}/>}

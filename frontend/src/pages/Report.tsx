@@ -1,3 +1,4 @@
+import {useTeam} from '../contexts/TeamContext';
 import { groupContent, consolidationKeys } from "../utils/consolidation";
 import { ConsolidationProvider, ConsolidateCheckbox, useConsolidation } from "../contexts/ConsolidationContext";
 import PdfFileList from "../components/PdfFileList";
@@ -62,6 +63,7 @@ export default function Report() {
   return <ConfigProvider key={id}><ConsolidationProvider><ReportContent /></ConsolidationProvider></ConfigProvider>;
 }
 function ReportContent() {
+  const team=useTeam();const canExport=!team.enabled||team.permissions?.includes('reports.export');
   const {profile} = useConfigAnalysis();
   const {sections: consolidatedSections} = useConsolidation();
   const { id } = useParams<{ id: string }>();
@@ -312,8 +314,8 @@ function ReportContent() {
   if (!["completed", "partial"].includes(job.status)) {
     return (
       <div className="max-w-2xl mx-auto px-6 py-12 space-y-6">
-        <Link to="/" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Home — all reports
+        <Link to="/library" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
+          <ArrowLeft className="w-4 h-4" /> All reports
         </Link>
         <div className="bg-navy-800 border border-navy-700 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
@@ -350,11 +352,11 @@ function ReportContent() {
     <div className="max-w-screen-2xl mx-auto px-6 py-6 space-y-5 pb-24">
       {/* Back + title */}
       <div className="flex flex-wrap items-center gap-4">
-        <Link to="/" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Home — all reports
+        <Link to="/library" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
+          <ArrowLeft className="w-4 h-4" /> All reports
         </Link>
         <h1 className="text-white font-semibold text-lg">
-          Upgrade Report:{" "}
+          {j.title || "Upgrade report"}:{" "}
           <span className="font-mono text-brand-500">{j.from_version}</span>
           <span className="text-gray-500 mx-2">→</span>
           <span className="font-mono text-brand-500">{j.to_version}</span>
@@ -364,7 +366,7 @@ function ReportContent() {
           {j.completed_at && ` · generated ${localDateTime(j.completed_at)}`}
         </span>
         <button
-          onClick={() => setDownloadOpen(true)}
+          disabled={!canExport} onClick={() => setDownloadOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-navy-800 hover:bg-navy-700 border border-navy-700 rounded-lg transition-colors shrink-0"
           title="Download self-contained HTML report"
         >
@@ -538,7 +540,7 @@ function ReportContent() {
           <span className="text-gray-500 text-xs">across {new Set(printItems.map((i) => i.sectionLabel)).size} section{new Set(printItems.map((i) => i.sectionLabel)).size !== 1 ? "s" : ""}</span>
           <div className="ml-auto flex items-center gap-3">
             <button
-              onClick={() => setPrintOpen(true)}
+              disabled={!canExport} onClick={() => setPrintOpen(true)}
               className="flex items-center gap-2 px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-lg transition-colors"
             >
               <Printer className="w-3.5 h-3.5" />

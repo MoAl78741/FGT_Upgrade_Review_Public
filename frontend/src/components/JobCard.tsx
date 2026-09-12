@@ -1,3 +1,4 @@
+import {req} from '../api';
 import PdfFileList from "./PdfFileList";
 import PdfProcessingProgress from "./PdfProcessingProgress";
 import {useTeam} from "../contexts/TeamContext";
@@ -65,7 +66,7 @@ const STATUS_LEFT_BORDER: Record<string, string> = {
 
 export default function JobCard({ job: initial }: Props) {
   const team = useTeam();
-  const readOnly = team.enabled && team.role === "viewer";
+  const readOnly = team.enabled && !team.permissions?.includes("reports.delete");
   const qc = useQueryClient();
   const navigate = useNavigate();
   // The home list polls job summaries; do not retain a second stale detail cache.
@@ -87,6 +88,7 @@ export default function JobCard({ job: initial }: Props) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs"] }),
   });
 
+  const rename=useMutation({mutationFn:(title:string)=>req('/jobs/'+current.id+'/title',{method:'PUT',body:JSON.stringify({title})}),onSuccess:()=>qc.invalidateQueries({queryKey:['jobs']})});
   const action = useMutation({mutationFn: (kind: 'cancel' | 'retry') => kind === 'cancel' ? api.cancelJob(current.id) : api.retryJob(current.id), onSuccess: () => { qc.invalidateQueries({queryKey: ['jobs']}); qc.invalidateQueries({queryKey: ['job', current.id]}); }});
   const hasLog = !!current.log?.trim();
 
@@ -112,6 +114,9 @@ export default function JobCard({ job: initial }: Props) {
           <span className="text-xs text-gray-500 bg-gray-800 border border-gray-700 px-2 py-0.5 rounded font-mono">selenium</span>
         )}
 
+        {current.title&&<strong className="text-white text-sm">{current.title}</strong>}
+        {(!team.enabled||team.permissions?.includes('reports.import'))&&<button className="text-xs text-brand-500 underline" disabled={rename.isPending} onClick={()=>{const title=window.prompt('Report name (leave blank to use the version range)',current.title||'');if(title!==null)rename.mutate(title)}}>Rename</button>}
+        {rename.error&&<span role="alert" className="text-red-400">{rename.error.message}</span>}
         <span className="ml-auto text-xs text-gray-600 shrink-0 tabular-nums">
           {localDateTime(current.created_at)}
         </span>
@@ -140,7 +145,7 @@ export default function JobCard({ job: initial }: Props) {
         )}
 
         <button
-          onClick={() => deleteMutation.mutate()}
+          onClick={() => {if(window.confirm('Permanently delete this report and its source PDFs? Reviews using it will lose access to these findings. This cannot be undone.')) deleteMutation.mutate();}}
           disabled={deleteMutation.isPending || readOnly}
           title={current.status === "running" ? "Force stop and delete this job" : "Delete job"}
           className="text-gray-700 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0 p-0.5 rounded hover:bg-gray-800"
@@ -151,8 +156,8 @@ export default function JobCard({ job: initial }: Props) {
 
       <div className="px-5 pb-3 text-sm space-y-1">
         <PdfProcessingProgress job={current} />
-        {isActive && <button disabled={action.isPending || readOnly} onClick={() => action.mutate('cancel')} className="underline mr-3">Cancel</button>}
-        {['failed', 'partial', 'cancelled'].includes(current.status) && <button disabled={action.isPending || readOnly} onClick={() => action.mutate('retry')} className="underline">Retry</button>}
+        {isActive && <button disabled={action.isPending || (team.enabled && !team.permissions?.includes("reports.control"))} onClick={() => action.mutate('cancel')} className="underline mr-3">Cancel</button>}
+        {['failed', 'partial', 'cancelled'].includes(current.status) && <button disabled={action.isPending || (team.enabled && !team.permissions?.includes("reports.control"))} onClick={() => action.mutate('retry')} className="underline">Retry</button>}
         {(action.error || deleteMutation.error) && <p role="alert">{(action.error || deleteMutation.error)?.message}</p>}
         {current.expires_at && <p>Expires: {localDateTime(current.expires_at)}</p>}
         <PdfFileList files={current.file_outcomes} jobStatus={current.status} />

@@ -1,6 +1,6 @@
 # Private team installation
 
-The private Docker edition enables named accounts by default. Public deployments continue to use temporary browser sessions and do not expose team administration. Native single-user development can explicitly use `TEAM_AUTH_ENABLED=false`.
+The Pro Docker edition enables named accounts by default. Public deployments continue to use temporary browser sessions and do not expose team administration. Native single-user development can explicitly use `TEAM_AUTH_ENABLED=false`.
 
 ## First administrator
 

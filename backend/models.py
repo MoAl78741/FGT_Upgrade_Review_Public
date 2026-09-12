@@ -14,6 +14,7 @@ class ScrapeJob(Base):
     __tablename__ = "scrape_jobs"
 
     id = Column(String(36), primary_key=True, default=_new_uuid)
+    title = Column(String(160), nullable=True)
     from_version = Column(String(20), nullable=False)
     to_version = Column(String(20), nullable=False)
     status = Column(String(20), nullable=False, default="pending")

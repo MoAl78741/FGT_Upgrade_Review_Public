@@ -48,6 +48,7 @@ def run_migrations() -> None:
 
     existing = {col["name"] for col in insp.get_columns("scrape_jobs")}
     pending = [
+        ("title", "VARCHAR(160)"),
         ("grid_url", "VARCHAR(256)"),
         ("source",   "VARCHAR(20)"), ("started_at", "DATETIME"),
         ("owner_id", "VARCHAR(64)"), ("expires_at", "DATETIME"),

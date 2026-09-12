@@ -1,6 +1,6 @@
 # System administration
 
-Open **System administration** in the private edition, or **Operator login** in the public edition. Interactive API documentation includes the same operations under `/api/administration`.
+Open **System administration** in the Pro edition, or **Operator login** in the public edition. Interactive API documentation includes the same operations under `/api/administration`.
 
 ## Access boundaries
 
@@ -29,7 +29,7 @@ The interaction is inspired by FortiManager's domain/profile organization, witho
 
 ## Encrypted backup and restore
 
-GUI archives use authenticated AES-256-GCM encryption with a per-archive random salt/nonce and a scrypt-derived key. Keep the backup password separately; the server cannot recover it. The GUI archive limit is **256 MiB**. Larger private installations should use the existing offline archive tools described in [Operations](../OPERATIONS.md).
+GUI archives use authenticated AES-256-GCM encryption with a per-archive random salt/nonce and a scrypt-derived key. Keep the backup password separately; the server cannot recover it. The GUI archive limit is **256 MiB**. Larger Pro installations should use the existing offline archive tools described in [Operations](../OPERATIONS.md).
 
 Private GUI backups include installation settings, accounts, domains, memberships, custom profiles, reports, reviews, original PDFs, report schedules, certificates/private keys, and the key used to encrypt saved SMTP credentials. They exclude login sessions, transient parser artifacts, delivery bodies/history, and audit/event history. Keep operational/audit exports separately if required.
 
@@ -42,7 +42,7 @@ Public GUI backups include installation settings, operator accounts, and certifi
 
 Private processing must be idle before backup/restore. A maintenance gate drains HTTP activity, while queue and delivery locks exclude background changes. Uploaded archives contain allowlisted JSON records and files, not executable SQLite databases. Path/link/expansion checks and authenticated encryption are validated before replacement. A locally generated recovery journal rolls back an interrupted database/file swap before startup processing resumes.
 
-The certificate currently serving HTTPS is preserved during restore, even when it is absent from the archive. Restored certificates are available for an explicit activation afterward. GUI restore does not modify operator-owned Compose files, origins, proxy templates, external DNS, or host trust stores. Archive schemas currently must match the running version.
+The certificate currently serving HTTPS is preserved during restore, even when it is absent from the archive. Restored certificates are available for an explicit activation afterward. GUI restore does not modify operator-owned Compose files, origins, proxy templates, external DNS, or host trust stores. Archive schemas must match the supported application schema. Earlier v3 backups without report names remain supported; missing titles default to blank.
 
 ## Certificates and HTTPS proxy
 
@@ -110,6 +110,6 @@ Use **Send test email** only with a recipient you intend to contact. Automated d
 | Delivery history/retry | `GET /api/administration/deliveries`, `POST /deliveries/{id}/retry` |
 | Review completion/reopening | `POST /api/reviews/{id}/completion` with `revision` and `completed` |
 
-See the [complete API guide](../API_GUIDE.md#administration-automation-reference) for exact HTTP methods, multipart fields, authentication examples and response formats. Coverage checks include 76 GUI HTTP operations.
+See the [complete API guide](../API_GUIDE.md#administration-automation-reference) for exact HTTP methods, multipart fields, authentication examples and response formats. Coverage checks include 78 GUI HTTP operations.
 
 Existing exact-origin, cookie, ownership, and edition restrictions apply. The new management upload paths authenticate before multipart spooling. No configuration-analysis upload endpoint has been added.

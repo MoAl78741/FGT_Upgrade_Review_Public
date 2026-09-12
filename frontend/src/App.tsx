@@ -6,6 +6,9 @@ import Installation from "./pages/Installation";
 import Breadcrumbs from "./components/Breadcrumbs";
 import Header from "./components/Header";
 import Home from "./pages/Home";
+import Pro from "./pages/Pro";
+import Example from "./pages/Example";
+import ReportLibrary from "./components/ReportLibrary";
 import Reviews from "./pages/Reviews";
 import ReviewPage from "./pages/Review";
 import Report from "./pages/Report";
@@ -24,6 +27,9 @@ function AppContent() {
       <main className="flex-1" id="main-content">
         <Breadcrumbs />
         <Routes>
+          <Route path="/pro" element={<Pro />} />
+          <Route path="/example" element={<Example />} />
+          <Route path="/library" element={assigned && can("reports.read") ? <ReportLibrary /> : <NoWorkspace />} />
           <Route path="/administration" element={<Administration />} />
           <Route path="/installation" element={<Installation />} />
           <Route path="/account" element={<Account />} />
@@ -33,6 +39,7 @@ function AppContent() {
           <Route path="/reports/:id" element={assigned && can("reports.read") ? <Report /> : <NoWorkspace />} />
         </Routes>
       </main>
+      <footer className="max-w-screen-xl mx-auto w-full px-6 py-6 text-sm text-gray-400 flex flex-wrap gap-5"><a href="/api/docs">API documentation</a><a href="/installation">Help & support</a><a href="/administration">Operator administration</a><span>Independent project · Not affiliated with Fortinet</span></footer>
     </div>
   );
 }

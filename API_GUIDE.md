@@ -161,3 +161,19 @@ For backup download, save `response.content` from POST `/backup`. For restore us
 `tests/test_api_coverage.py` checks that GUI operations are discoverable in OpenAPI, required upload fields remain documented, profiles and schedules can be managed entirely through HTTP, and domain members cannot access installation administration. The administration, security, team, and presentation suites cover authorization, restore, certificate validation, delivery, source parity, and export behavior.
 
 Browser-only presentation settings (theme, temporary selection) remain client state. Configuration analysis and relevance annotations use `/assets/local-api.mjs` locally. PDF printing uses the exported HTML with a local browser; there is no HTTP endpoint accepting raw configurations or a server-side PDF renderer.
+
+
+## Pro branding and usability APIs (build 20260912.3)
+
+The former private product is now **Pro**. Compatibility identifiers (`APP_EDITION=private`, API `edition: private`, existing volumes, database ownership and repository name) remain unchanged. Capabilities additionally return `edition_label` (`Pro` or `Public`) and `pro_upgrade_url`. Operators may set `PRO_UPGRADE_URL` to an HTTPS sales/signup page; credentials in URLs, non-HTTPS and malformed URLs are rejected from discovery. An unset destination leaves the benefits page available without a purchase link. No public session content is transferred to Pro.
+
+- `PUT /api/jobs/{job_id}/title` takes `{"title":"Branch upgrade"}` (up to 160 characters; blank clears it). It changes metadata only and requires report-import permission.
+- `PUT /api/reviews/{review_id}/bulk-decisions` takes `revision`, `finding_ids` (1–100), `status`, and `note`. Every finding must belong to that accessible review. Validation and revision checks apply before one atomic update. A nonempty reason is required for `not_applicable`. This uses the same review-write permission as individual decisions.
+- The report library searches/filter/paginates authorized `GET /api/jobs` results locally. Naming, imports, exports and processing controls follow effective permissions.
+- Session archives call existing authorized job/review/source/export APIs and package the results in a bounded 256 MiB ZIP in the browser. They contain JSON, HTML and available source PDFs, not browser configuration profiles. An unavailable file aborts the archive with an actionable message. Archives are personal downloads, not installation backups or session-restore files; HTML can be reopened offline.
+- The local JavaScript API exports `sessionZip(entries)` and `ARCHIVE_LIMIT`. Entries contain `name` and a `Uint8Array` named `data`. This pure writer performs no network or persistence operations.
+- Export previews use the same HTML renderer and a sandboxed frame. Authenticated source-PDF routes allow same-origin embedding; application pages remain protected against framing.
+
+Review edits show Unsaved/Saving/Saved status. Navigation and filtering/pagination warn before losing drafts; exports and completion require saved edits. Bulk changes require selecting findings and previewing the affected list. The example report is synthetic and creates no server records.
+
+Existing encrypted v3 backups without the new report-title column remain accepted; the missing title defaults to blank. Unknown schema differences remain rejected.

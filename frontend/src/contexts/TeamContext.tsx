@@ -35,8 +35,8 @@ export function TeamProvider({children}: {children: ReactNode}) {
   if (state.error) return <div className="max-w-lg mx-auto p-8 text-red-400"><p>Unable to check account access: {state.error.message}</p><button className="underline" onClick={() => state.refetch()}>Try again</button></div>;
   if (!state.data) return <p className="p-8 text-gray-400">Checking account access…</p>;
   if (state.data.enabled && !state.data.authenticated) return <main className="max-w-md mx-auto p-8 space-y-5">
-    <h1 className="text-2xl text-white font-semibold">Sign in to Upgrade Review</h1><p className="text-gray-400">Private team edition</p>
-    {state.data.setup_required ? <p className="text-amber-400">An installation administrator must create the first account using the local setup command. See the private installation guide.</p> : <form onSubmit={e => {e.preventDefault();login.mutate();}} className="space-y-4">
+    <h1 className="text-2xl text-white font-semibold">Sign in to Upgrade Review</h1><p className="text-gray-400">Pro team edition</p>
+    {state.data.setup_required ? <p className="text-amber-400">An installation administrator must create the first account using the local setup command. See the Pro installation guide.</p> : <form onSubmit={e => {e.preventDefault();login.mutate();}} className="space-y-4">
       <label className="block text-gray-400">Username<input className={field} autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={80} /></label>
       <label className="block text-gray-400">Password<input type="password" className={field} autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required maxLength={256} /></label>
       {login.error && <p role="alert" className="text-red-400">{login.error.message}</p>}<button className="bg-brand-500 text-white rounded p-3" disabled={login.isPending}>{login.isPending ? 'Signing in…' : 'Sign in'}</button>

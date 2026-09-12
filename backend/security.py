@@ -1,5 +1,6 @@
 """Session ownership and browser request isolation, shared by every API route."""
 import hashlib
+import re
 import secrets
 import time
 from collections import OrderedDict
@@ -120,12 +121,16 @@ class RequestSecurity:
             return message
         async def secure_send(message):
             if message['type'] == 'http.response.start':
+                source_pdf = bool(re.fullmatch(r'/api/jobs/[^/]+/files/\d+', scope.get('path', '')))
+                policy = b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+                if source_pdf:
+                    policy = policy.replace(b"frame-ancestors 'none'", b"frame-ancestors 'self'")
                 message.setdefault('headers', []).extend([
                     (b'x-content-type-options', b'nosniff'),
                     (b'referrer-policy', b'no-referrer'),
-                    (b'x-frame-options', b'DENY'),
+                    (b'x-frame-options', b'SAMEORIGIN' if source_pdf else b'DENY'),
                     (b'cache-control', b'no-store'),
-                    (b'content-security-policy', b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")])
+                    (b'content-security-policy', policy)])
             await send(message)
         await self.app(scope, bounded_receive, secure_send)
 

@@ -15,6 +15,7 @@ export interface FileOutcome {
 }
 
 export interface Job {
+  title?: string | null;
   id: string;
   from_version: string;
   include_from?: boolean;

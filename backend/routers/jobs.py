@@ -32,6 +32,17 @@ def response(job, detail=False):
     return result
 
 
+def pro_upgrade_url():
+    import os
+    from urllib.parse import urlsplit
+    value = os.getenv('PRO_UPGRADE_URL', '').strip()
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return None
+    return value if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password else None
+
+
 @router.get('/capabilities')
 def capabilities(request: Request, response: Response, db: Session = Depends(get_db)):
     # Private login must remain discoverable before selecting a workspace.
@@ -40,7 +51,8 @@ def capabilities(request: Request, response: Response, db: Session = Depends(get
         owner(request, response, db)
     cfg = effective(db, settings)
     return {'team_auth': settings.team_auth and not settings.public, 'version': VERSION, 'build_number': BUILD_NUMBER, 'build_revision': BUILD_REVISION,
-            'source_code_url': settings.source_code_url, 'edition': settings.edition, 'scraping': settings.scraping,
+            'source_code_url': settings.source_code_url, 'edition': settings.edition,
+            'edition_label': 'Public' if settings.public else 'Pro', 'pro_upgrade_url': pro_upgrade_url(), 'scraping': settings.scraping,
             'selenium': settings.scraping and bool(settings.grid_url), 'config_analysis': 'browser-only',
             'retention_hours': 24 if settings.public else None,
             'max_files': cfg.max_files, 'max_file_bytes': settings.file_bytes,
@@ -146,3 +158,17 @@ def source_file(job_id: str, file_index: int, db: Session = Depends(get_db), own
         raise HTTPException(404, 'Source file unavailable')
     return FileResponse(path, media_type='application/pdf', filename=Path(item['name']).name,
                         content_disposition_type='inline')
+
+
+from pydantic import BaseModel, ConfigDict, Field
+
+class ReportTitle(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    title: str = Field(max_length=160)
+
+@router.put('/jobs/{job_id}/title', response_model=JobResponse, summary='Name a report without changing source content')
+def rename_report(job_id: str, data: ReportTitle, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    job = owned_job(db, job_id, owner_id)
+    job.title = data.title.strip() or None
+    db.commit()
+    return response(job)

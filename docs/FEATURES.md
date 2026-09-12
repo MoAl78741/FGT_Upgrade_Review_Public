@@ -92,7 +92,7 @@ Configuration presence is not evidence of runtime use. All notes remain visible 
 - Detect conflicting edits instead of silently overwriting another reviewer's changes.
 - Export a review package that combines source evidence with clearly separated assessment.
 
-Private installations add named accounts, administrative domains backed by customer workspaces, built-in and custom permission profiles, and attributable audit history. Mark reviews complete to trigger configured email notifications; editing a completed review reopens it.
+Pro installations add named accounts, administrative domains backed by customer workspaces, built-in and custom permission profiles, and attributable audit history. Mark reviews complete to trigger configured email notifications; editing a completed review reopens it.
 
 ### Processing you can follow and tune
 
@@ -121,7 +121,7 @@ Private administrators can tune timeout, batch size, page limits, and concurrenc
 
 ## Two independent editions
 
-| Capability | Private Docker edition | Public edition |
+| Capability | Pro Docker edition | Public edition |
 | --- | --- | --- |
 | Intended deployment | Local machine or controlled team LAN | Operator-hosted temporary sessions |
 | PDF import | Local, user-provided documents | User-provided documents |
@@ -140,7 +140,7 @@ Public cookies are not portable accounts. Clearing them loses access to the sess
 
 ### Installation administration
 
-Both editions provide encrypted GUI/API backup and restore with validation preview, certificate upload/inspection/activation, and protected administration. Public operator backups exclude visitor reports and PDFs. Private installations add domain metadata and read-only/archive states, custom permission profiles, local event logs, syslog, job-failure and completed-review notifications, and scheduled summary emails. SMTP starts disabled; scheduled summaries contain links and counts, not PDF attachments.
+Both editions provide encrypted GUI/API backup and restore with validation preview, certificate upload/inspection/activation, and protected administration. Public operator backups exclude visitor reports and PDFs. Pro installations add domain metadata and read-only/archive states, custom permission profiles, local event logs, syslog, job-failure and completed-review notifications, and scheduled summary emails. SMTP starts disabled; scheduled summaries contain links and counts, not PDF attachments.
 
 See [Administration](ADMINISTRATION.md) for setup, backup boundaries, certificate renewal responsibilities and limitations. These functions use the same authenticated APIs as the GUI. The editions are independently maintained repositories with inherited shared code; fixes must be ported deliberately.
 

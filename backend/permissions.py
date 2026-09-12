@@ -33,6 +33,7 @@ def operation(request):
         if m in ('GET','HEAD','OPTIONS') or p.endswith('/view'): return 'reports.read'
         if m == 'DELETE': return 'reports.delete'
         if p.endswith(('/cancel','/retry')): return 'reports.control'
+        if p.endswith('/title') and m == 'PUT': return 'reports.import'
         if p in ('/api/jobs','/api/jobs/upload'): return 'reports.import'
     if p.startswith('/api/reviews'):
         if p.endswith('/export'): return 'reviews.export'

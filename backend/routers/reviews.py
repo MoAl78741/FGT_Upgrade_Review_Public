@@ -268,6 +268,27 @@ def decide(review_id: str, finding_id: str, data: DecisionInput, db: Session = D
     return metadata(review)
 
 
+class BulkDecisionInput(DecisionInput):
+    finding_ids: list[str] = Field(min_length=1, max_length=100)
+
+
+@router.put('/{review_id}/bulk-decisions', summary='Apply one decision to explicitly selected findings atomically')
+def bulk_decide(review_id: str, data: BulkDecisionInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    review = owned_review(db, review_id, owner_id)
+    jobs, _ = content(db, review, owner_id)
+    available = {f['id'] for f in findings(jobs)}
+    if not set(data.finding_ids) <= available:
+        raise HTTPException(404, 'A selected finding is unavailable. Reload the review.')
+    if data.status == 'not_applicable' and not data.note.strip():
+        raise HTTPException(422, 'Explain why the selected findings are not applicable.')
+    decisions = json.loads(review.decisions_json)
+    value = data.model_dump(exclude={'revision', 'finding_ids'}) | {'updated_at': datetime.utcnow().isoformat(), 'reviewed_by': db.info.get('actor', {}).get('name')}
+    for identity in set(data.finding_ids):
+        decisions[identity] = value
+    save(db, review, data.revision, decisions_json=json.dumps(decisions))
+    return metadata(review)
+
+
 @router.put('/{review_id}/checklist')
 def checklist(review_id: str, data: ChecklistInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
     review = owned_review(db, review_id, owner_id)

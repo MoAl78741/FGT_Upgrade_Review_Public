@@ -67,3 +67,7 @@ Read [SECURITY.md](SECURITY.md) for implemented controls, open container advisor
 ## System administration
 
 Installation operators can download encrypted settings backups, preview and apply restores, and upload, inspect or activate HTTPS certificates. Visitor reports and PDFs are excluded from public backups. See the [administration guide](docs/ADMINISTRATION.md) for operator provisioning and recovery. All administration actions are available through the [API](API_GUIDE.md).
+
+## Current workflow
+
+Start with an upload or the synthetic example, then use the report library to search and name your work. Review drafts have navigation protection; selected findings support previewed bulk decisions. Export previews and downloadable session archives help you verify and retain results. See [the changelog](CHANGELOG.md) and [API guide](API_GUIDE.md).

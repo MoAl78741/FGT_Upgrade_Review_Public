@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0 — build 20260912.3
+
+- Renamed the private-facing product to Pro while retaining compatible API and deployment identifiers. Public has an Upgrade to Pro benefits page with an optional operator-configured HTTPS destination.
+- Simplified imports, added a synthetic example, filename-version correction, a searchable report library, report names and deletion confirmation.
+- Added expiry guidance, bounded session ZIP downloads, export previews and source-PDF comparison in reviews.
+- Added unsaved-edit protection, save status, Save and next, atomic bulk decisions, permission-aware controls and consolidated administration navigation.
+
 ## 3.0.0 — build 20260912.2
 
 - Verified 76 GUI HTTP operations in the OpenAPI contract; added regression checks to both CI workflows.

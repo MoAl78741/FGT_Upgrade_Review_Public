@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { X, Download, FileDown } from "lucide-react";
 import type { JobDetail } from "../../types";
-import { getAvailableSections, downloadHtml } from "../../utils/htmlExport";
+import ExportPreview from "../ExportPreview";
+import { getAvailableSections, downloadHtml, generateHtml } from "../../utils/htmlExport";
 
 interface Props {
   job: JobDetail;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function DownloadModal({ job, onClose }: Props) {
+  const [preview,setPreview]=useState(false);
   const sections = getAvailableSections(job);
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(sections.map((s) => s.id))
@@ -34,6 +36,7 @@ export default function DownloadModal({ job, onClose }: Props) {
     onClose();
   }
 
+  if(preview)return <ExportPreview html={generateHtml(job,selected)} onClose={()=>setPreview(false)}/>;
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -41,7 +44,7 @@ export default function DownloadModal({ job, onClose }: Props) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-navy-800 border border-navy-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        {/* Header */}
+        <button className="m-4 text-brand-500 underline" disabled={!selected.size} onClick={()=>setPreview(true)}>Preview selected content</button>{/* Header */}
         <div
           className="h-0.5"
           style={{ background: "linear-gradient(90deg, rgb(var(--accent)) 0%, rgb(var(--accent)/0.3) 60%, transparent 100%)" }}

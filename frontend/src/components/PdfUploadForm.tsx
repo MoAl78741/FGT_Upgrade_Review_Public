@@ -27,7 +27,7 @@ export default function PdfUploadForm() {
     if (mutation.isPending) return;
     setError("");
     const selected = Array.from(incoming); // FileList is live; snapshot before resetting the input.
-    setFiles(prev => [...prev, ...selected]);
+    setFiles(prev => [...prev, ...selected.filter(f => !prev.some(p => p.name===f.name && p.size===f.size && p.lastModified===f.lastModified))]);
   }
 
   function removeFile(index: number) {
@@ -73,7 +73,7 @@ export default function PdfUploadForm() {
           <h2 className="text-white font-semibold text-sm tracking-wide uppercase">Upload Release Note PDFs</h2>
         </div>
 
-        <PdfDownloadHelper files={files} maxFiles={limits?.max_files} />
+        <details className="mb-5 rounded-lg border border-navy-600 p-4"><summary className="cursor-pointer font-semibold text-brand-500">Help me find PDFs for a version range</summary><div className="mt-4"><PdfDownloadHelper files={files} maxFiles={limits?.max_files} /></div></details>
 
         {/* Drop zone */}
         <div
@@ -120,6 +120,8 @@ export default function PdfUploadForm() {
                 >
                   <FileText className="w-4 h-4 text-brand-500 shrink-0" />
                   <span className="text-sm text-gray-300 truncate flex-1 font-mono">{f.name}</span>
+                  <span className="text-xs text-gray-400">{(f.size/1024**2).toFixed(1)} MiB</span>
+                  {!detected&&<label className="text-xs text-amber-400">Set version<input aria-label={`Version for ${f.name}`} className="w-24 bg-navy-800 border border-navy-600 p-1" placeholder="7.6.6" onBlur={e=>{const version=e.target.value.trim();if(/^\d{1,2}\.\d{1,2}\.\d{1,3}$/.test(version))setFiles(old=>old.map((file,i)=>i===index?new File([file],`fortios-v${version}-${file.name}`,{type:file.type,lastModified:file.lastModified}):file));}}/></label>}
                   {detected && (
                     <span
                       className="text-xs font-mono px-1.5 py-0.5 rounded shrink-0"
@@ -147,6 +149,7 @@ export default function PdfUploadForm() {
           </div>
         )}
 
+        {files.length>0&&<p role="status" className={selectionError?'text-amber-400 mb-3':'text-emerald-500 mb-3'}>{selectionError||'Preflight passed: filenames, versions, duplicates and byte limits checked. PDF validity and page limits are checked during processing.'}</p>}
         {/* Detected versions hint */}
         {detectedVersions.length > 0 && (
           <p className="text-xs text-gray-600 mb-4">
