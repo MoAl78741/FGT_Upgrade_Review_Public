@@ -78,3 +78,86 @@ Also exported: `FEATURES`, `RULE_VERSION`, `reportView`, `reportDelimited`, `com
 ## System administration
 
 See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.
+
+## Administration automation reference
+
+All paths below start with `/api/administration`. Use the private named administrator session or the separate public operator session. Private-only endpoints remain unavailable to public operators. JSON requests use `Content-Type: application/json`; multipart uploads must let the client set the boundary.
+
+| Action | Method and path | Request / result |
+| --- | --- | --- |
+| Check operator login | `GET /status` | Edition, authenticated state, initial-password requirement |
+| Public operator login | `POST /login` | `username`, `password`; retain returned cookie |
+| Public operator password change | `POST /password` | `current_password`, `new_password` |
+| Public operator logout | `POST /logout` | Revokes operator session |
+| System overview | `GET /overview` | Build, backup scope, uploaded certificates, delivery counts |
+| Download encrypted backup | `POST /backup` | JSON `password`; response is binary `.fgtbackup`, not JSON |
+| Preview restore | `POST /restore/preview` | Multipart `file`, `password`; returns archive `sha256`, scope/counts |
+| Apply restore | `POST /restore/apply` | Multipart same `file`, `password`, `current_password`, preview `sha256`, `confirmation: RESTORE` |
+| List uploaded certificates | `GET /certificates` | Public metadata only; no private keys |
+| Upload certificate | `POST /certificates` | Multipart `certificate`, `private_key`, optional `key_password` |
+| Download public PEM chain | `GET /certificates/{identity}/download` | PEM response, not JSON |
+| Activate certificate | `POST /certificates/{identity}/activate` | Uses the operator-configured proxy connection |
+| Delete unused certificate | `DELETE /certificates/{identity}` | Active certificate deletion is rejected |
+| List domains (private) | `GET /domains` | Domain IDs, metadata, state, membership counts |
+| Edit domain (private) | `PUT /domains/{identity}` | `name`, `description`, `firmware_branch`, `state` |
+| List permissions/profiles (private) | `GET /profiles` | Allowed permission names and built-in/custom profiles |
+| Create/copy profile (private) | `POST /profiles` | `name`, `permissions`; copy by submitting an existing profile's permissions under a new name |
+| Update/delete profile (private) | `PUT /profiles/{identity}`, `DELETE /profiles/{identity}` | PUT takes `name`, `permissions`; assigned/built-in deletion rejected |
+| View/download event page | `GET /logs?before=123&action=review&severity=info` | Latest 100 matching events; save response as JSON, use last ID for next page |
+| Read/update syslog (private) | `GET /syslog`, `PUT /syslog` | `enabled`, `host`, `port`, `transport`, `retention_days` |
+| Test syslog (private) | `POST /syslog/test` | Queues metadata event; inspect `/logs` for forwarding outcome |
+| Read/update SMTP (private) | `GET /mail`, `PUT /mail` | See fields below; saved password is never returned |
+| Test email (private) | `POST /mail/test` | `recipient`; queues real delivery when enabled |
+| Inspect delivery history (private) | `GET /deliveries` | Latest 100 statuses/errors/attempt counts |
+| Retry failed delivery (private) | `POST /deliveries/{identity}/retry` | Queues retry; verify uncertain deliveries before retrying |
+| List/create schedules (private) | `GET /schedules`, `POST /schedules` | POST takes fields below; returns `id` |
+| Update/delete schedule (private) | `PUT /schedules/{identity}`, `DELETE /schedules/{identity}` | PUT takes complete schedule fields; `enabled: false` pauses it |
+
+SMTP PUT fields are `enabled`, `host`, `port`, `security` (`starttls`, `tls`, or local-test-only `plain`), `sender`, `username`, `password`, `clear_password`, `events` (`job.failed`, `review.completed`), and `workspace_recipients` (domain ID → email-address array). Read responses return `password_set` instead of a password. A blank password preserves the existing secret; `clear_password: true` removes it. PUT supplies the complete desired configuration; omitted optional fields revert to their defaults.
+
+Schedule fields are `workspace_id`, `name`, `recipients`, `interval_hours`, and `enabled`. These are summary emails with authorized links, not PDF attachments. Updating a schedule recalculates its next run. The overview/history endpoints provide the same delivery feedback as the GUI.
+
+Create a domain with `POST /api/auth/workspaces` (`name`), then update its metadata using `PUT /api/administration/domains/{identity}`. Assign a custom profile using `PUT /api/auth/memberships` with `workspace_id`, `user_id`, and `role` set to the returned profile ID. Remove assignment with `DELETE /api/auth/memberships/{workspace_id}/{user_id}`. Select a domain using `POST /api/auth/workspace` before accessing its reports/reviews.
+
+Mark a review complete or reopen it with `POST /api/reviews/{review_id}/completion`, JSON `revision` and `completed` (boolean). Use the latest revision from GET; stale writes return 409. Completion queues the configured notification exactly as the GUI does.
+
+### Script authentication
+
+This Python example prompts for credentials, validates TLS, and retains the secure cookie. It only reads administration status and overview; it sends no email and changes no settings.
+
+```python
+import getpass
+import requests
+
+origin = 'https://10.8.9.11:8442'  # Public operator: change to port 8443
+public_operator = False
+session = requests.Session()
+session.verify = '/absolute/path/to/fgt-v3-local-ca.crt'
+session.headers['Origin'] = origin
+prefix = '/api/administration' if public_operator else '/api/auth'
+response = session.post(origin + prefix + '/login', json={
+    'username': input('Username: '),
+    'password': getpass.getpass('Password: '),
+}, timeout=30)
+response.raise_for_status()
+try:
+    status = session.get(origin + prefix + '/status', timeout=30)
+    status.raise_for_status()
+    print(status.json())
+    # A temporary password must first be changed through prefix + '/password'.
+    response = session.get(origin + '/api/administration/overview', timeout=30)
+    response.raise_for_status()
+    print(response.json())
+finally:
+    session.post(origin + prefix + '/logout', timeout=30).raise_for_status()
+```
+
+For backup download, save `response.content` from POST `/backup`. For restore use `files={'file': open(archive_path, 'rb')}` and `data={...}` with the fields above; reopen the file for the apply request. Restore replaces installation data and revokes sessions, so it requires explicit archive hash and current-password confirmation. Do not put secrets into command-line arguments, source control, or logs.
+
+`401` requires login; `403` indicates permission, origin, or mandatory password-change restrictions; `404` can mean unavailable edition or inaccessible object; `409` indicates a state/revision conflict; `413` means upload size exceeded; `422` means invalid input. Processing/render capacity limits may return `429`. Consult the returned `detail` and current settings before retrying.
+
+### Coverage checks
+
+`tests/test_api_coverage.py` checks that GUI operations are discoverable in OpenAPI, required upload fields remain documented, profiles and schedules can be managed entirely through HTTP, and domain members cannot access installation administration. The administration, security, team, and presentation suites cover authorization, restore, certificate validation, delivery, source parity, and export behavior.
+
+Browser-only presentation settings (theme, temporary selection) remain client state. Configuration analysis and relevance annotations use `/assets/local-api.mjs` locally. PDF printing uses the exported HTML with a local browser; there is no HTTP endpoint accepting raw configurations or a server-side PDF renderer.

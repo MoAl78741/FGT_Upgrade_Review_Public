@@ -60,6 +60,7 @@ def configure_schema(app):
 
 **Public sessions:** first call GET /api/capabilities and retain the HttpOnly cookie.
 **Private teams:** call POST /api/auth/login; change a temporary password with POST /api/auth/password before proceeding. Select a workspace using POST /api/auth/workspace ; X-Workspace-ID guards against stale workspace selection. Swagger uses your existing browser login. Viewer roles may read and export; changes require reviewer/admin access.
+**Public operators:** use POST /api/administration/login and /password for the separate operator account. Ordinary visitor cookies cannot administer the installation. Domain profiles, SMTP, syslog and scheduled summaries require a private installation administrator.
 **Scripts:** retain cookies (e.g. curl -c cookies.txt -b cookies.txt), send Origin matching the installation's exact HTTPS origin on POST/PUT/DELETE requests, and use your installation's trusted CA. UUIDs do not grant access.
 
 Report exports use the same source renderer as the GUI. HTML exports are self-contained and print-ready; print them to PDF, as in the GUI. Filtering and consolidation never alter stored reports.
@@ -74,8 +75,28 @@ Report exports use the same source renderer as the GUI. HTML exports are self-co
                 params = op.setdefault('parameters', [])
                 if path.startswith(('/api/jobs', '/api/reviews')):
                     params.append({'in':'header', 'name':'X-Workspace-ID', 'required':False, 'schema':{'type':'string'}, 'description':'Optional stale-workspace guard; must match the selected workspace. Select with POST /api/auth/workspace.'})
-                if path == '/api/jobs/upload' or path.endswith('/retry'):
+                if path in {'/api/jobs/upload', '/api/jobs/{job_id}/retry'}:
                     params.append({'in':'header','name':'X-PDF-Timeout-Minutes','required':False,'schema':{'type':'integer','minimum':1,'maximum':120}, 'description':'Attempt timeout; cannot exceed the effective installation limit.'})
+        # Uploads intentionally parse multipart only after authentication/queue reservation.
+        # Describe their body explicitly without introducing eager FastAPI File parsing.
+        result['paths']['/api/jobs/upload']['post']['requestBody'] = {
+            'required': True,
+            'content': {'multipart/form-data': {'schema': {
+                'type': 'object', 'required': ['files'],
+                'properties': {'files': {'type': 'array', 'minItems': 1,
+                    'items': {'type': 'string', 'format': 'binary'},
+                    'description': 'One PDF per version. Repeat the files field; filenames must include the FortiOS version. Effective count and byte limits are returned by GET /api/capabilities.'}}
+            }}}
+        }
+        for path, method, mime, description in [
+            ('/api/administration/backup', 'post', 'application/octet-stream', 'Encrypted .fgtbackup archive; save the binary response.'),
+            ('/api/administration/certificates/{identity}/download', 'get', 'application/x-pem-file', 'Public PEM certificate chain; private key is never returned.'),
+            ('/api/jobs/{job_id}/files/{file_index}', 'get', 'application/pdf', 'Original source PDF, subject to report ownership and retention.'),
+        ]:
+            result['paths'][path][method]['responses']['200'] = {
+                'description': description,
+                'content': {mime: {'schema': {'type': 'string', 'format': 'binary'}}},
+            }
         app.openapi_schema = result
         return result
     app.openapi = schema
