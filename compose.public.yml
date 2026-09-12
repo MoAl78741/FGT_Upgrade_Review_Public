@@ -1,0 +1,15 @@
+# Deploy behind a TLS reverse proxy. Never expose the API port directly.
+services:
+  fgt-upgrade:
+    build:
+      context: .
+      args:
+        APP_EDITION: public
+    environment:
+      APP_EDITION: public
+      SOURCE_CODE_URL: "${SOURCE_CODE_URL:?Set SOURCE_CODE_URL to the corresponding source for this release}"
+      APP_ORIGIN: "${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN to your HTTPS site origin}"
+      ENABLE_SCRAPING: "false"
+      SELENIUM_GRID_URL: ""
+    healthcheck:
+      test: ["CMD", "python", "-m", "backend.healthcheck"]

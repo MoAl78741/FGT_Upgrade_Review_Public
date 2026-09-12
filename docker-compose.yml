@@ -1,0 +1,36 @@
+services:
+  fgt-upgrade:
+    build: .
+    image: fgt-upgrade-review-public:3.0.0
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8001}:8000"
+    environment:
+      APP_EDITION: public
+      TEAM_AUTH_ENABLED: "false"
+      APP_ORIGIN: "${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN to your exact HTTPS origin}"
+      SOURCE_CODE_URL: "${SOURCE_CODE_URL:?Set SOURCE_CODE_URL to the exact deployed source archive}"
+      ENABLE_SCRAPING: "false"
+      SELENIUM_GRID_URL: ""
+      MAX_PDF_FILES: "${MAX_PDF_FILES:-100}"
+      MAX_PDF_MIB: "${MAX_PDF_MIB:-50}"
+      MAX_UPLOAD_MIB: "${MAX_UPLOAD_MIB:-150}"
+      MAX_PDF_PAGES: "${MAX_PDF_PAGES:-500}"
+      JOB_TIMEOUT_SECONDS: "${JOB_TIMEOUT_SECONDS:-1800}"
+      MAX_WORKERS: "${MAX_WORKERS:-2}"
+      MAX_QUEUED_JOBS: "${MAX_QUEUED_JOBS:-10}"
+      MAX_STORAGE_MIB: "${MAX_STORAGE_MIB:-2048}"
+      WORKER_MEMORY_MIB: "${WORKER_MEMORY_MIB:-2048}"
+    volumes:
+      - fgt-data:/app/data
+      - fgt-uploads:/app/uploads
+    read_only: true
+    tmpfs:
+      - /tmp:size=192m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 5g
+    pids_limit: 128
+    restart: unless-stopped
+volumes:
+  fgt-data:
+  fgt-uploads:

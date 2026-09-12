@@ -1,0 +1,42 @@
+name: Security and regression checks
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '31 8 * * 1'
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: sudo apt-get update && sudo apt-get install -y libseccomp2
+      - run: pip install --require-hashes -r requirements.lock
+      - run: pip install pytest httpx pip-audit pip-licenses
+      - run: pip-audit -r requirements.lock
+      - run: python -m pytest tests/test_api_client.py tests/test_reviews.py tests/test_team.py tests/test_maintenance.py tests/test_security.py tests/test_content_parity.py tests/test_pdf_parser_units.py tests/test_parser_generalization.py tests/test_pdf_section_boundaries.py tests/test_pdf_issue_markdown.py tests/test_pdf_callouts.py tests/test_pdf_heading_levels.py tests/test_pdf_prose_format.py tests/test_pdf_table_format.py tests/test_pdf_table_lists.py tests/test_pdf_table_continuations.py tests/test_range_notices.py tests/test_pdf_worker.py tests/test_performance_paths.py tests/test_fgt_utils.py tests/test_scraper_html.py -q
+      - run: npm ci && npm audit && npm run test:content && npm run build
+        working-directory: frontend
+      - run: python -m pytest tests/test_presentation_api.py -q
+      - run: pip-licenses --format=json --with-urls --with-license-file --no-license-path > python-licenses.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dependency-licenses
+          path: python-licenses.json
+      - run: docker build -t fgt-upgrade-review:ci .
+      - uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: fgt-upgrade-review:ci
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          format: table
+      - run: docker run --rm --cap-drop ALL --security-opt no-new-privileges fgt-upgrade-review:ci python -m backend.sandbox_check
