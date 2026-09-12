@@ -279,7 +279,7 @@ def test_initial_admin_is_created_once_and_never_resets_existing_accounts(tmp_pa
 
 def test_viewers_may_use_readonly_report_tools(named, monkeypatch):
     from backend.routers import presentation
-    monkeypatch.setattr(presentation,'render',lambda payload: 'report' if payload['operation']=='html' else {'entries':[]})
+    monkeypatch.setattr(presentation,'render',lambda payload: 'report' if payload['operation']=='html' else {'job_id':'one-job','source_count':0,'count':0,'sections':[],'entries':[]})
     c,_=named;login(c,'viewer')
     assert c.post('/api/jobs/one-job/view',json={}).status_code == 200
     assert c.post('/api/jobs/one-job/export',json={}).status_code == 200
