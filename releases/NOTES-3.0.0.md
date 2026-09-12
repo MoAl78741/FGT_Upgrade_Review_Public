@@ -1,3 +1,5 @@
+> Historical notes for the initial v3.0.0 release, before repository separation and administration builds. See the [current changelog](../CHANGELOG.md), [edition README](../README.md), and [administration guide](../docs/ADMINISTRATION.md) for current behavior.
+
 # Public and private editions
 
 Version 3.0.0 provides two editions from one AGPL source tree:

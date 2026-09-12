@@ -48,7 +48,7 @@ The certificate currently serving HTTPS is preserved during restore, even when i
 
 Upload a PEM certificate chain (leaf first, then intermediates) and a matching PEM private key. Encrypted keys are supported with an input password. The application checks key matching, chain signatures, validity dates, server usage, and hostname/IP SANs. RSA keys require at least 2048 bits; EC keys require at least 256 bits. Certificate trust remains the client/device's responsibility.
 
-The inventory shows names, issuer, expiry, days remaining, SHA-256 fingerprint, and active status. Downloading returns only the public chain. Private keys are stored with owner-only permissions and are only included in encrypted installation backups. Unused certificates can be deleted. Certificates expiring within 30 days appear on the overview.
+The uploaded-certificate inventory shows names, issuer, expiry, days remaining, SHA-256 fingerprint, and active status. Default Caddy-managed certificates are automatically renewed and are not listed in this uploaded inventory. Manually uploaded certificates require operator renewal/replacement. Downloading returns only the public chain. Private keys are stored with owner-only permissions and are only included in encrypted installation backups. Unused certificates can be deleted. Certificates expiring within 30 days appear on the overview.
 
 Activation requires a **dedicated proxy for each edition**, using the provided management integration:
 
@@ -109,5 +109,7 @@ Use **Send test email** only with a recipient you intend to contact. Automated d
 | Scheduled summaries | `/api/administration/schedules` and `/{id}` |
 | Delivery history/retry | `GET /api/administration/deliveries`, `POST /deliveries/{id}/retry` |
 | Review completion/reopening | `POST /api/reviews/{id}/completion` with `revision` and `completed` |
+
+See the [complete API guide](../API_GUIDE.md#administration-automation-reference) for exact HTTP methods, multipart fields, authentication examples and response formats. Coverage checks include 76 GUI HTTP operations.
 
 Existing exact-origin, cookie, ownership, and edition restrictions apply. The new management upload paths authenticate before multipart spooling. No configuration-analysis upload endpoint has been added.

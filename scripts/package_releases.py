@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 VERSION = '3.0.0'
 TREES = ('backend', 'fgt_upgrade', 'frontend/src', 'frontend/tests', 'tests', 'scripts', 'licenses', 'releases', 'docs', 'deployment', '.github')
 FILES = ('Dockerfile', '.dockerignore', '.gitignore', 'docker-compose.yml', 'compose.public.yml', 'compose.administration.yml',
-         'EDITION', 'LICENSE', 'README.md', 'API_GUIDE.md', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'requirements.txt',
+         'EDITION', 'LICENSE', 'README.md', 'CHANGELOG.md', 'API_GUIDE.md', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'requirements.txt',
          'requirements.lock', 'fortigate_dashboard.py',
          'frontend/package.json', 'frontend/package-lock.json', 'frontend/index.html',
          'frontend/tsconfig.json', 'frontend/tsconfig.node.json', 'frontend/vite.config.ts',

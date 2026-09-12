@@ -11,7 +11,7 @@
 [![Docker](https://img.shields.io/badge/Deploy-Docker-2496ED?logo=docker&logoColor=white)](releases/PUBLIC.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0--or--later-7C3AED)](LICENSE)
 
-**[Features](docs/FEATURES.md) · [Installation](releases/PUBLIC.md) · [API](API_GUIDE.md) · [Security](SECURITY.md) · [Licensing](docs/LICENSING.md)**
+**[Administration](docs/ADMINISTRATION.md) · [Changelog](CHANGELOG.md) · [Features](docs/FEATURES.md) · [Installation](releases/PUBLIC.md) · [API](API_GUIDE.md) · [Security](SECURITY.md) · [Licensing](docs/LICENSING.md)**
 
 </div>
 
@@ -19,7 +19,7 @@
 
 Bring scattered release notes into searchable reports and structured upgrade reviews. Built for network/security engineers, firewall administrators, consultants, and change reviewers who need to connect source evidence with their own assessment.
 
-User-provided PDFs only; hosted scraping is disabled. Reports and original PDFs expire after 24 hours. Sessions are isolated; there are no named accounts or shared report libraries.
+User-provided PDFs only; hosted scraping is disabled. Reports and original PDFs expire after 24 hours. Sessions are isolated; visitors have no named accounts or shared report libraries. Installation administration uses a separate named operator login.
 
 ## Review workflow
 
@@ -66,4 +66,4 @@ Read [SECURITY.md](SECURITY.md) for implemented controls, open container advisor
 
 ## System administration
 
-See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.
+Installation operators can download encrypted settings backups, preview and apply restores, and upload, inspect or activate HTTPS certificates. Visitor reports and PDFs are excluded from public backups. See the [administration guide](docs/ADMINISTRATION.md) for operator provisioning and recovery. All administration actions are available through the [API](API_GUIDE.md).

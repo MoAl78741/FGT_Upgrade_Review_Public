@@ -70,5 +70,5 @@ These checks support the documented LAN validation deployment. They do not appro
 
 - Complete licensing/legal/privacy review and publish the exact corresponding source and dependency notices before a hosted pilot. Publishing source/install packages does not deploy a hosted website.
 - Validate the target production kernel with `python -m backend.sandbox_check`; unsupported confinement environments fail closed. Production support is the hardened Linux Docker deployment; native macOS is for development.
-- Put any LAN private deployment behind an authenticated TLS reverse proxy. Preserve the configured Host and Origin; apply per-client request limits at the trusted proxy.
+- Put any LAN private deployment behind a TLS reverse proxy and enable the application’s named web authentication. Do not add a second browser Basic Auth prompt; installation administration requires a named administrator. Preserve the configured Host and Origin; apply per-client request limits at the trusted proxy.
 - Re-run CI and the image scan for the actual release digest. These checks are not a comprehensive penetration test.

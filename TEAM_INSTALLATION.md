@@ -22,15 +22,16 @@ For an operator-selected first username/password before first startup, `python -
 
 ## Customer access
 
-Sign in and open **Account & administration**. Create customer workspaces, then create named accounts and assign workspace access:
+Sign in and open **Account & access**. Create customer workspaces, then create named accounts and assign workspace access:
 
 | Role | Access |
 |---|---|
 | Installation administrator | All customers, account administration, full audit history |
 | Reviewer | Read, import, edit, export and delete within assigned workspaces |
 | Viewer | Read and export within assigned workspaces |
+| Custom access profile | Explicit report, review and audit permissions within assigned domains |
 
-Administrators have access to every workspace. Assign ordinary reviewer or viewer accounts for customer-limited access. Account creation does not send email: share the initial password through your approved secure channel and ask the user to change it from Account. There is no public registration or email recovery.
+Administrators have access to every workspace. Assign ordinary reviewer, viewer, or custom-profile memberships for customer-limited access. Create custom profiles under System administration, then assign their IDs as membership roles. Domain read-only/archived states deny writes. Custom domain profiles never grant installation administration. Account creation does not send email: share the initial password through your approved secure channel and ask the user to change it from Account. There is no public registration or email recovery.
 
 The customer selector controls the active workspace. Switching customers reloads the page. Another tab with the former workspace cannot save against the changed selection; reload that tab before continuing. Removing membership takes effect on subsequent API requests. Disabling an account, changing administrator access or resetting its password ends all its sessions. A user changing their own password keeps the current session and ends the others. At least one active administrator must remain.
 

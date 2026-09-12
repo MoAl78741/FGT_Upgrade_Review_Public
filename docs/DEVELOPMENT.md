@@ -33,6 +33,8 @@ Local development defaults to a Development build identity. Runtime data and upl
 | Path | Responsibility |
 | --- | --- |
 | `backend/` | API, ownership/authentication, persistence, job dispatch, parser isolation, reviews, and maintenance. |
+| `backend/administration.py`, `permissions.py`, `notifications.py` | Operator authentication, domain permissions, event forwarding and mail delivery. |
+| `backend/installation_archive.py`, `restore_journal.py`, `certificates.py` | Encrypted backups, interrupted-restore recovery and HTTPS certificate integration. |
 | `backend/routers/` | HTTP endpoints and request-level access checks. |
 | `backend/pdf_parser.py` | PDF structure and rich-content extraction. |
 | `fgt_upgrade/` | Documentation scraping and shared extraction helpers. |
@@ -64,7 +66,7 @@ A focused source-fidelity and presentation check:
 For security, accounts, reviews, and packaging changes:
 
 ```sh
-.venv/bin/python -m pytest tests/test_security.py tests/test_team.py tests/test_reviews.py tests/test_maintenance.py tests/test_release_packaging.py -q
+.venv/bin/python -m pytest tests/test_api_coverage.py tests/test_administration.py tests/test_security.py tests/test_team.py tests/test_reviews.py tests/test_maintenance.py tests/test_release_packaging.py -q
 ```
 
 The [CI workflow](../.github/workflows/security.yml) is the maintained list of automated release checks, including dependency and container scans. Some legacy tools/tests expect a live application or local documents; use the named regression suites rather than assuming every historical script is an isolated unit test.

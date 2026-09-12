@@ -1,12 +1,12 @@
 # Public edition · 3.0.0
 
 This is the PDF-only hosted application. It provides temporary cookie sessions,
-not accounts or a shared library. Reports and PDFs expire after 24 hours;
+not visitor accounts or a shared library. A separate named operator administers settings, backups and certificates. Reports and PDFs expire after 24 hours;
 configuration analysis stays in the browser. Scraping is always disabled.
 
 Requirements: Docker with Compose v2, Linux Landlock support, at least 5 GiB
 available to the container, a domain, and a TLS reverse proxy. This source bundle
-includes the same code and license notices as the private edition.
+is built from the independent public repository and retains inherited code and license notices.
 
 1. Extract the archive and open a terminal in its directory.
 2. Copy `releases/public.env.example` to `.env`.
@@ -28,6 +28,8 @@ For diagnostics, use the same Compose options with `logs --tail=100`.
 To stop, use those options with `down`; do not use `--volumes` unless intentionally
 removing temporary sessions and reports. Do not back up public uploaded content
 or enable infrastructure snapshots that outlive the advertised retention period.
+
+For operator provisioning, encrypted settings/certificate backup and restore, and the optional managed HTTPS proxy, follow [Administration](../docs/ADMINISTRATION.md). Public visitor content is excluded from these backups. Private domains, custom team roles, syslog and email delivery remain unavailable in the public edition.
 
 Publish source and notices and complete the legal review before inviting public
 users. Remaining container advisory remediation is deferred in SECURITY.md;
