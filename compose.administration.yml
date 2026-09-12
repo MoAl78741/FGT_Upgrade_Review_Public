@@ -1,0 +1,38 @@
+# Optional per-edition HTTPS proxy and GUI certificate activation. Compose v2 required.
+services:
+  fgt-upgrade:
+    environment:
+      ADMIN_STATE_DIR: /system/administration
+      APP_ORIGIN: "${APP_ORIGIN:?Set APP_ORIGIN to the exact HTTPS origin (also set PUBLIC_ORIGIN for public)}"
+      CADDY_ADMIN_URL: http://proxy:2019
+      CADDY_CONFIG_TEMPLATE: /app/deployment/caddy.json
+      CADDY_CERTIFICATE_MOUNT: /system/administration/certificates
+    volumes:
+      - fgt-system:/system
+      - ./deployment/caddy.json:/app/deployment/caddy.json:ro
+  proxy:
+    build:
+      context: .
+      dockerfile: deployment/Proxy.Dockerfile
+    command: ["caddy", "run", "--resume", "--config", "/etc/caddy/caddy.json"]
+    ports:
+      - "${TLS_BIND:-127.0.0.1}:${TLS_PORT:-8443}:8443"
+    volumes:
+      - ./deployment/caddy.json:/etc/caddy/caddy.json:ro
+      - fgt-system:/system:ro
+      - proxy-data:/data
+      - proxy-config:/config
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    pids_limit: 64
+    restart: unless-stopped
+    depends_on:
+      fgt-upgrade:
+        condition: service_healthy
+volumes:
+  fgt-system:
+  proxy-data:
+  proxy-config:

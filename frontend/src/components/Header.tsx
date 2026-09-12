@@ -94,6 +94,7 @@ export default function Header() {
       </div>
       <nav aria-label="Main navigation" className="max-w-screen-2xl mx-auto px-4 sm:px-6 pb-3 flex flex-wrap gap-2">
         {[{to: '/', label: 'Home', end: true}, {to: '/reviews', label: 'Upgrade reviews'},
+          ...(caps?.edition === 'public' || team.user?.is_admin ? [{to: '/administration', label: caps?.edition === 'public' ? 'Operator login' : 'System administration'}] : []),
           ...(team.enabled ? [{to: '/account', label: 'Account & access'}] : []),
           ...(caps?.edition === 'private' ? [{to: '/installation', label: 'Setup & support'}] : [])
         ].map(item => <NavLink key={item.to} to={item.to} end={item.end}

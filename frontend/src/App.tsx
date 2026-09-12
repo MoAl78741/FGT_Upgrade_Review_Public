@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import {TeamProvider, WorkspaceBar, useTeam} from "./contexts/TeamContext";
+import Administration from "./pages/Administration";
 import Account from "./pages/Account";
 import Installation from "./pages/Installation";
 import Breadcrumbs from "./components/Breadcrumbs";
@@ -15,6 +16,7 @@ export default function App() {
 function AppContent() {
   const team = useTeam();
   const assigned = !team.enabled || !!team.role;
+  const can = (permission:string) => !team.enabled || !!team.permissions?.includes(permission);
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -22,12 +24,13 @@ function AppContent() {
       <main className="flex-1" id="main-content">
         <Breadcrumbs />
         <Routes>
+          <Route path="/administration" element={<Administration />} />
           <Route path="/installation" element={<Installation />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/" element={assigned ? <Home /> : <NoWorkspace />} />
-          <Route path="/reviews" element={assigned ? <Reviews /> : <NoWorkspace />} />
-          <Route path="/reviews/:id" element={assigned ? <ReviewPage /> : <NoWorkspace />} />
-          <Route path="/reports/:id" element={assigned ? <Report /> : <NoWorkspace />} />
+          <Route path="/" element={assigned && can("reports.read") ? <Home /> : <NoWorkspace />} />
+          <Route path="/reviews" element={assigned && can("reviews.read") ? <Reviews /> : <NoWorkspace />} />
+          <Route path="/reviews/:id" element={assigned && can("reviews.read") ? <ReviewPage /> : <NoWorkspace />} />
+          <Route path="/reports/:id" element={assigned && can("reports.read") ? <Report /> : <NoWorkspace />} />
         </Routes>
       </main>
     </div>
@@ -35,5 +38,5 @@ function AppContent() {
 }
 
 function NoWorkspace() {
-  return <p className="max-w-lg mx-auto p-8 text-gray-300">Choose an assigned customer workspace above. If none are listed, ask your installation administrator to assign access. You can still manage your password from Account.</p>;
+  return <p className="max-w-lg mx-auto p-8 text-gray-300">Choose an assigned domain with permission to view this page. Ask your installation administrator to update your access profile if needed. You can still manage your password from Account.</p>;
 }

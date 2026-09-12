@@ -63,3 +63,7 @@ Read [SECURITY.md](SECURITY.md) for implemented controls, open container advisor
 ## License
 
 **AGPL-3.0-or-later**. See [LICENSE](LICENSE) and [licensing rationale](docs/LICENSING.md). Commercial use is permitted subject to the license; repository visibility does not replace source-sharing obligations. This independent project is not affiliated with or endorsed by Fortinet. Vendor documents retain their own copyrights and terms.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.

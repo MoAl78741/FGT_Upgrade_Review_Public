@@ -55,3 +55,7 @@ Sessions use random HttpOnly, SameSite=Strict cookies with an eight-hour expiry,
 ## Older-build rollback
 
 Older builds cannot enforce the initial-password flag. Before rolling back, disable any account still awaiting its initial password change and revoke its sessions, or restore the complete pre-upgrade database snapshot. Do not run an older image against an active `admin` / `password` account. The supplied deployment rollback procedure disables a pending initial administrator before selecting the older image.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.

@@ -18,3 +18,6 @@ selenium>=4.0.0
 
 # Preserve source formatting through dashboard and exports
 markdownify>=1.2.3
+
+# Encrypted installation backups, stored credentials and certificate validation
+cryptography>=43.0.0

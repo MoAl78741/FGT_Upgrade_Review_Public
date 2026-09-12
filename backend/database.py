@@ -29,13 +29,18 @@ def run_migrations() -> None:
     without ever dropping data.
     """
     insp = inspect(engine)
+    if 'workspaces' in insp.get_table_names():
+        columns = {c['name'] for c in insp.get_columns('workspaces')}
+        with engine.begin() as conn:
+            for name, kind in [('description', "TEXT NOT NULL DEFAULT ''"), ('firmware_branch', "VARCHAR(20) NOT NULL DEFAULT ''"), ('state', "VARCHAR(20) NOT NULL DEFAULT 'active'")]:
+                if name not in columns: conn.execute(text(f'ALTER TABLE workspaces ADD COLUMN {name} {kind}'))
     if 'team_users' in insp.get_table_names() and 'must_change_password' not in {c['name'] for c in insp.get_columns('team_users')}:
         with engine.begin() as conn:
             conn.execute(text('ALTER TABLE team_users ADD COLUMN must_change_password BOOLEAN NOT NULL DEFAULT 0'))
     if 'reviews' in insp.get_table_names():
         columns = {c['name'] for c in insp.get_columns('reviews')}
         with engine.begin() as conn:
-            for name, kind in [('range_from', 'VARCHAR(20)'), ('range_to', 'VARCHAR(20)'), ('range_include_from', 'BOOLEAN')]:
+            for name, kind in [('completed_at', 'DATETIME'), ('range_from', 'VARCHAR(20)'), ('range_to', 'VARCHAR(20)'), ('range_include_from', 'BOOLEAN')]:
                 if name not in columns:
                     conn.execute(text(f'ALTER TABLE reviews ADD COLUMN {name} {kind}'))
     if "scrape_jobs" not in insp.get_table_names():

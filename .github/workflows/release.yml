@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: pip install --require-hashes -r requirements.lock
       - run: pip install pytest httpx
-      - run: python -m pytest tests/test_security.py tests/test_api_client.py tests/test_reviews.py tests/test_team.py tests/test_maintenance.py tests/test_content_parity.py tests/test_pdf_parser_units.py tests/test_pdf_section_boundaries.py tests/test_pdf_issue_markdown.py tests/test_pdf_callouts.py tests/test_pdf_heading_levels.py tests/test_pdf_prose_format.py tests/test_pdf_table_format.py tests/test_pdf_table_lists.py tests/test_pdf_table_continuations.py tests/test_range_notices.py tests/test_pdf_worker.py tests/test_performance_paths.py tests/test_fgt_utils.py tests/test_scraper_html.py tests/test_release_packaging.py -q
+      - run: python -m pytest tests/test_security.py tests/test_api_client.py tests/test_reviews.py tests/test_team.py tests/test_administration.py tests/test_maintenance.py tests/test_content_parity.py tests/test_pdf_parser_units.py tests/test_pdf_section_boundaries.py tests/test_pdf_issue_markdown.py tests/test_pdf_callouts.py tests/test_pdf_heading_levels.py tests/test_pdf_prose_format.py tests/test_pdf_table_format.py tests/test_pdf_table_lists.py tests/test_pdf_table_continuations.py tests/test_range_notices.py tests/test_pdf_worker.py tests/test_performance_paths.py tests/test_fgt_utils.py tests/test_scraper_html.py tests/test_release_packaging.py -q
       - run: npm ci && npm run test:content && npm run build
         working-directory: frontend
       - run: python -m pytest tests/test_presentation_api.py -q

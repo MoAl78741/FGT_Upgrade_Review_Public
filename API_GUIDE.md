@@ -74,3 +74,7 @@ const html = reportHtml({...reportJson, localRelevance: profile}, {
 ```
 
 Also exported: `FEATURES`, `RULE_VERSION`, `reportView`, `reportDelimited`, `compareFeatures`, `pdfReleaseRange`, `pdfCatalog`, `reviewPackageHtml`, `generateHtml`, and `getAvailableSections`. HTTP export schemas reject config/profile fields. If relevance annotations are wanted, apply them locally after retrieving your authorized report JSON.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.

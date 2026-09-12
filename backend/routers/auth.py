@@ -60,7 +60,7 @@ class SelectWorkspace(BaseModel):
 
 class MembershipInput(SelectWorkspace):
     user_id: str = Field(min_length=1, max_length=36)
-    role: Literal['reviewer', 'viewer']
+    role: str = Field(min_length=1, max_length=20)
 
 
 def require_enabled():
@@ -91,7 +91,7 @@ def user_view(user):
 
 def available_workspaces(db, user):
     all_spaces = db.query(Workspace).order_by(Workspace.name).all()
-    return [{'id': w.id, 'name': w.name, 'role': role} for w in all_spaces if (role := team.workspace_role(db, user, w.id))]
+    return [{'id': w.id, 'name': w.name, 'role': role, 'description': w.description, 'firmware_branch': w.firmware_branch, 'state': w.state} for w in all_spaces if (role := team.workspace_role(db, user, w.id))]
 
 
 def admin_transaction(request, db):
@@ -111,6 +111,7 @@ def status(request: Request, db: Session = Depends(get_db)):
         return {'enabled': True, 'authenticated': False, 'setup_required': not db.query(TeamUser).count()}
     spaces = [] if user.must_change_password else available_workspaces(db, user)
     return {'enabled': True, 'authenticated': True, 'user': user_view(user), 'workspaces': spaces,
+            'permissions': [] if user.must_change_password or not session.workspace_id else __import__('backend.permissions', fromlist=['profile_permissions']).profile_permissions(db, team.workspace_role(db, user, session.workspace_id)) or [],
             'workspace_id': None if user.must_change_password else session.workspace_id, 'role': None if user.must_change_password else team.workspace_role(db, user, session.workspace_id)}
 
 
@@ -120,6 +121,8 @@ def login(data: Credentials, request: Request, response: Response, db: Session =
     user = db.query(TeamUser).filter(TeamUser.username == data.username.lower()).first()
     valid = team.verify_password(data.password, user.password_hash if user else team.DUMMY_HASH)
     if not valid or not user or not user.active:
+        from ..administration import record_event
+        record_event(db, 'session.login_failed', severity='warning');db.commit()
         raise HTTPException(401, 'Invalid username or password.')
     token = secrets.token_urlsafe(32)
     spaces = [] if user.must_change_password else available_workspaces(db, user)
@@ -241,6 +244,8 @@ def grant_membership(data: MembershipInput, request: Request, db: Session = Depe
     admin_transaction(request, db)
     if not db.get(TeamUser, data.user_id) or not db.get(Workspace, data.workspace_id):
         raise HTTPException(404, 'User or workspace not found.')
+    from ..permissions import profile_permissions
+    if data.role == 'admin' or profile_permissions(db, data.role) is None: raise HTTPException(422, 'Unknown access profile.')
     db.merge(WorkspaceMember(**data.model_dump()))
     team.audit(db, 'membership.granted', data.user_id, workspace_id=data.workspace_id, details={'role': data.role}); db.commit()
     return data.model_dump()

@@ -60,3 +60,7 @@ DB_PATH=/path/to/empty/data/restored.db UPLOADS_DIR=/path/to/empty/uploads \
 Private installation administrators can open **Setup & support → Preview diagnostics**, review every field, then download the JSON. The tool includes the app/build revision, OS family, Python version, configured processing limits, known table availability and counts by known job status. It excludes filesystem paths, hostnames, customer/account identifiers, source text, filenames, uploaded configurations, extracted feature profiles and logs. There is no automatic submission to support.
 
 Operators can also run `python -m backend.maintenance diagnostics`. Treat full database archives and application logs as confidential; they are not diagnostic files and must not be attached casually to support requests.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.

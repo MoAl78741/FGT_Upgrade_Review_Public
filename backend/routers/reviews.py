@@ -75,7 +75,7 @@ def owned_review(db, review_id, owner_id):
 
 def metadata(review):
     fields = ['id', 'title', 'customer', 'site', 'prepared_by', 'summary', 'rollback_notes',
-              'revision', 'created_at', 'updated_at', 'expires_at', 'range_from', 'range_to', 'range_include_from']
+              'completed_at', 'revision', 'created_at', 'updated_at', 'expires_at', 'range_from', 'range_to', 'range_include_from']
     data = {field: getattr(review, field) for field in fields}
     for field in ['expected_versions', 'job_ids', 'decisions', 'checklist']:
         data[field] = json.loads(getattr(review, field + '_json'))
@@ -155,6 +155,7 @@ def detail(db, review, owner_id):
 
 
 def save(db, review, revision, **values):
+    if 'completed_at' not in values: values['completed_at'] = None
     result = db.execute(update(Review).where(Review.id == review.id, Review.revision == revision)
                         .values(**values, revision=revision + 1, updated_at=datetime.utcnow()))
     if result.rowcount != 1:
@@ -289,3 +290,25 @@ def delete_review(review_id: str, db: Session = Depends(get_db), owner_id=Depend
     db.delete(owned_review(db, review_id, owner_id))
     team.audit(db, 'review.deleted', review_id, workspace_id=owner_id)
     db.commit()
+
+
+class CompletionInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    revision: int = Field(ge=1)
+    completed: bool
+
+@router.post('/{review_id}/completion')
+def set_completion(review_id: str, data: CompletionInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    review=owned_review(db,review_id,owner_id)
+    if data.completed and review.completed_at:
+        if review.revision!=data.revision:raise HTTPException(409,'Review changed; reload before continuing.')
+        return metadata(review)
+    # Completion and queued notification commit together with the same revision guard.
+    result=db.execute(update(Review).where(Review.id==review.id,Review.revision==data.revision).values(
+        completed_at=datetime.utcnow() if data.completed else None,revision=data.revision+1,updated_at=datetime.utcnow()))
+    if result.rowcount!=1:db.rollback();raise HTTPException(409,'Review changed; reload before continuing.')
+    team.audit(db,'review.completed' if data.completed else 'review.reopened',review.id,workspace_id=owner_id)
+    if data.completed:
+        from ..notifications import notify
+        notify(db,'review.completed',owner_id,review.id)
+    db.commit();db.refresh(review);return metadata(review)

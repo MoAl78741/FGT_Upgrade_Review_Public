@@ -1,4 +1,5 @@
 import PdfFileList from "../components/PdfFileList";
+import {req} from '../api';
 import {pdfCatalog, compareVersions} from '../utils/pdfReleaseRange';
 import {reviewVersionRange} from '../utils/reviewVersionRange';
 import { useState } from 'react';
@@ -86,6 +87,7 @@ export default function ReviewPage() {
   const filtered = r.findings.filter(f => f.section === 'special_notices' || (statusFilter === 'all' || (r.decisions[f.id]?.status ?? 'unreviewed') === statusFilter) && JSON.stringify(f.source).toLowerCase().includes(filter.toLowerCase()));
   return <div className="max-w-screen-xl mx-auto p-6 space-y-6">
     <h1 className="text-2xl font-semibold text-white">{r.title}</h1>
+    <div className="flex gap-3 items-center text-gray-300"><span>{r.completed_at ? 'Review completed · '+localDateTime(r.completed_at) : 'Review in progress'}</span><button className={buttonStyle} disabled={busy} onClick={()=>{if(window.confirm(r.completed_at?'Reopen this review?':'Mark this review complete? Configured domain recipients will be notified. This does not certify upgrade safety.'))mutation.mutate(()=>req('/reviews/'+id+'/completion',{method:'POST',body:JSON.stringify({revision:r.revision,completed:!r.completed_at})}));}}>{r.completed_at?'Reopen review':'Complete review'}</button></div>
     <p className="text-sm text-gray-300">Upgrade review · Add source reports below, record decisions in Review findings, then finish your checklist and export the review package.</p>
     <p className="text-gray-400">{r.jobs.length} available batches · {r.findings.length} findings · {counts.unreviewed} unreviewed · {counts.needs_testing} need testing · {counts.action_required} actions required · {r.checklist.filter(i => i.done).length}/{r.checklist.length} checklist actions complete</p>
     {r.expires_at && <p className="text-amber-400">Temporary review expires {localDateTime(r.expires_at)}. Source batches keep their own expiry.</p>}

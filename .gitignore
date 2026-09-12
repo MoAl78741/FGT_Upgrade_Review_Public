@@ -51,3 +51,6 @@ stack.env
 *.db
 *.db-*
 work/
+
+# Operator-generated proxy configuration
+deployment/caddy.json

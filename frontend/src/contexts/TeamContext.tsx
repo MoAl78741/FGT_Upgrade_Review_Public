@@ -3,7 +3,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {req, setWorkspaceHeader} from '../api';
 
 export type TeamUser = {id: string; username: string; is_admin: boolean; active: boolean; must_change_password?: boolean};
-export type TeamState = {enabled: boolean; authenticated: boolean; setup_required?: boolean; user?: TeamUser; workspace_id?: string; role?: string; workspaces?: {id: string; name: string; role: string}[]};
+export type TeamState = {enabled: boolean; authenticated: boolean; setup_required?: boolean; user?: TeamUser; workspace_id?: string; role?: string; permissions?: string[]; workspaces?: {id: string; name: string; role: string}[]};
 const Context = createContext<TeamState>({enabled: false, authenticated: false});
 export const useTeam = () => useContext(Context);
 const field = 'block w-full rounded border border-navy-600 bg-navy-800 text-white p-3';
@@ -52,10 +52,10 @@ export function WorkspaceBar() {
   const logout = useMutation({mutationFn: () => teamRequest('/logout', 'POST'), onSuccess: () => window.location.assign('/')});
   if (!team.enabled) return null;
   return <div className="border-b border-navy-600 px-6 py-3 flex flex-wrap items-center gap-3 text-sm text-gray-300">
-    <label className="flex gap-2 items-center">Customer workspace<select aria-label="Customer workspace" className="bg-navy-800 border border-navy-600 rounded p-2" value={team.workspace_id || ''} disabled={mutation.isPending} onChange={e => {if(window.confirm('Switch customer workspace? Unsaved edits in this tab will be lost.')) mutation.mutate(e.target.value);}}><option value="" disabled>Choose workspace</option>{team.workspaces?.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}</select></label>
+    <label className="flex gap-2 items-center">Domain<select aria-label="Administrative domain" className="bg-navy-800 border border-navy-600 rounded p-2" value={team.workspace_id || ''} disabled={mutation.isPending} onChange={e => {if(window.confirm('Switch administrative domain? Unsaved edits in this tab will be lost.')) mutation.mutate(e.target.value);}}><option value="" disabled>Choose workspace</option>{team.workspaces?.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}</select></label>
     <span>{team.user?.username} · {team.role || 'No workspace assigned'}</span>
     <button className="ml-auto underline" disabled={logout.isPending} onClick={() => logout.mutate()}>Sign out</button>
-    <p className="w-full text-xs text-gray-300">Your workspace determines which reports and upgrade reviews you see. Use Account & access to manage your password and permissions.</p>
+    <p className="w-full text-xs text-gray-300">Your domain is an isolated customer workspace. Its assigned access profile controls available report and review operations. Use Account & access to manage your password and permissions.</p>
     {(mutation.error || logout.error) && <p role="alert" className="text-red-400">{(mutation.error || logout.error)?.message}</p>}
   </div>;
 }

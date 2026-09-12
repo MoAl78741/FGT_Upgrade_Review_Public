@@ -277,6 +277,16 @@ def run_job(job_id):
                 job.completed_at = datetime.utcnow()
                 db.commit()
 
+    finally:
+        from .administration import record_event
+        from .notifications import notify
+        with SessionLocal() as db:
+            job=db.get(ScrapeJob,job_id)
+            if job and job.status in ('completed','partial','failed','cancelled'):
+                record_event(db,'job.'+job.status,workspace_id=job.owner_id,target_id=job.id,severity='warning' if job.status in ('failed','partial') else 'info')
+                if job.status in ('failed','partial'):notify(db,'job.failed',job.owner_id,job.id)
+                db.commit()
+
 
 def dispatch():
     active = {}
@@ -327,6 +337,8 @@ def start():
         raise RuntimeError('Run one API/dispatcher process per database.')
     # Acquire the installation lease before additive migrations or any data writes.
     try:
+        from .restore_journal import recover
+        recover(DB_PATH)
         initialize_database()
     except BaseException:
         LEASE.close(); LEASE = None
@@ -342,9 +354,13 @@ def start():
         clean_expired(db)
     THREAD = threading.Thread(target=dispatch, daemon=True)
     THREAD.start()
+    from . import notifications
+    notifications.start()
 
 
 def stop():
+    from . import notifications
+    notifications.stop()
     STOP.set()
     if THREAD:
         THREAD.join(timeout=5)
