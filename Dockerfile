@@ -20,7 +20,7 @@ COPY licenses/ ./licenses/
 COPY --from=frontend-builder /usr/local/bin/node /usr/local/bin/node
 COPY --from=frontend-builder /usr/local/LICENSE ./licenses/NODE-LICENSE
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-RUN mkdir -p /app/data /app/uploads && chown appuser:appgroup /app/data /app/uploads
+RUN mkdir -p /app/data /app/uploads /system && chown appuser:appgroup /app/data /app/uploads /system
 USER 10001:10001
 # Identity belongs after dependency layers so a new build number does not reinstall them.
 ARG BUILD_NUMBER=dev
