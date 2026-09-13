@@ -55,9 +55,9 @@ def test_headerless_fragments_merge_only_with_unique_consecutive_source_pages():
 
 
 def test_plain_cell_paragraphs_preserve_native_spacing(tmp_path):
-    import pymupdf
+    from tests.pdf_factory import Document
     from backend.pdf_table_lists import add_table_lists
-    path=tmp_path/'paragraphs.pdf';doc=pymupdf.open();page=doc.new_page()
+    path=tmp_path/'paragraphs.pdf';doc=Document();page=doc.new_page()
     page.draw_rect((50,90,550,220));page.draw_line((200,90),(200,220));page.draw_line((50,125),(550,125))
     page.insert_text((60,110),'System',fontsize=10);page.insert_text((210,110),'Browsers',fontsize=10)
     page.insert_text((60,145),'Platform',fontsize=10)

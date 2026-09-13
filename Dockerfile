@@ -1,22 +1,26 @@
-FROM node:22-bookworm-slim AS frontend-builder
+FROM node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5 AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci --no-audit --no-fund
+COPY vendor/npm/ /vendor/npm/
+RUN npm ci --offline --cache /vendor/npm --no-audit --no-fund
 COPY frontend/ ./
 COPY scripts/build-api.cjs /app/scripts/build-api.cjs
 RUN npm run build
 
-FROM python:3.12-slim-trixie
+FROM python:3.12-slim-trixie@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 DB_PATH=/app/data/fgt_upgrade.db UPLOADS_DIR=/app/uploads
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends libseccomp2 libfontconfig1 && rm -rf /var/lib/apt/lists/*
+COPY vendor/debian/linux-amd64/ /vendor/debian/
+RUN dpkg -i /vendor/debian/*.deb && rm -rf /vendor/debian /var/lib/apt/lists/*
 WORKDIR /app
 COPY requirements.lock ./
-RUN pip install --no-cache-dir --require-hashes -r requirements.lock
+COPY vendor/python/linux-amd64/ /vendor/python/
+RUN pip install --no-index --find-links /vendor/python --no-cache-dir --require-hashes -r requirements.lock && rm -rf /vendor/python
 RUN groupadd --gid 10001 appgroup && useradd --uid 10001 --gid appgroup --no-create-home appuser
 COPY backend/ ./backend/
 COPY fgt_upgrade/ ./fgt_upgrade/
 COPY LICENSE THIRD_PARTY_NOTICES.md TEAM_INSTALLATION.md OPERATIONS.md API_GUIDE.md ./
 COPY licenses/ ./licenses/
+COPY scripts/audit_pdf_dependencies.py ./scripts/audit_pdf_dependencies.py
 COPY --from=frontend-builder /usr/local/bin/node /usr/local/bin/node
 COPY --from=frontend-builder /usr/local/LICENSE ./licenses/NODE-LICENSE
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist

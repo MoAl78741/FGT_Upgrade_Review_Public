@@ -66,3 +66,7 @@ Operators can also run `python -m backend.maintenance diagnostics`. Treat full d
 ## System administration
 
 See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.
+
+## Offline dependency bundle
+
+PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.

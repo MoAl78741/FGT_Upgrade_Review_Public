@@ -1,0 +1,4 @@
+-c requirements-runtime.constraints
+-r requirements-dev.txt
+# Intel macOS baseline; cryptography 50 no longer publishes Intel macOS wheels.
+cryptography==48.0.1

@@ -1,5 +1,5 @@
 import base64
-import pymupdf
+from tests.pdf_factory import Document
 from backend.pdf_callouts import add_callouts
 from fgt_upgrade.content import source_table, source_markdown
 from bs4 import BeautifulSoup
@@ -20,7 +20,7 @@ def test_ordinary_image_table_is_not_a_note():
 
 def test_pdf_bordered_note_requires_exact_text_and_is_idempotent(tmp_path):
     path = tmp_path / 'notes.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page(width=612, height=792)
     pixel = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9foAAAAASUVORK5CYII=')
     page.insert_image((90, 110, 120, 140), stream=pixel)
@@ -49,7 +49,7 @@ def test_publisher_note_table_without_icon_alt_text_is_recognized():
 
 def test_issue_callout_belongs_to_preceding_id_and_remains_idempotent(tmp_path):
     path = tmp_path / 'issue-note.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page(width=612, height=792)
     page.insert_text((60, 85), '936747', fontsize=10)
     pixel = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9foAAAAASUVORK5CYII=')

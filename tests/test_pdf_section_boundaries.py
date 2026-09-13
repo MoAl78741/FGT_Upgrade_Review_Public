@@ -4,8 +4,8 @@ from backend import pdf_parser
 
 
 def test_limitations_issue_category_does_not_end_resolved_chapter(tmp_path, monkeypatch):
-    pymupdf = pytest.importorskip('pymupdf')
-    doc = pymupdf.open()
+    from tests.pdf_factory import Document
+    doc = Document()
     page = doc.new_page()
     page.insert_text((50, 100), 'Resolved issues', fontsize=27)
     page.insert_text((50, 160), 'Limitations', fontsize=21)
@@ -22,7 +22,7 @@ def test_limitations_issue_category_does_not_end_resolved_chapter(tmp_path, monk
     path = tmp_path / 'fortios-v7.2.8-release-notes.pdf'
     doc.save(path)
     doc.close()
-    monkeypatch.setattr(pdf_parser, 'PYMUPDF4LLM_AVAILABLE', False)
+    monkeypatch.setattr(pdf_parser, 'RICH_MARKDOWN_ENABLED', False)
     _, data, _, _, _ = pdf_parser.parse_pdf(path)
     assert data['resolved-issues'] == [{
         'category': 'Limitations', 'Bug ID': '961992',
@@ -33,8 +33,8 @@ def test_limitations_issue_category_does_not_end_resolved_chapter(tmp_path, monk
 
 
 def test_wrapped_comma_separated_ids_stay_with_one_description(tmp_path, monkeypatch):
-    pymupdf = pytest.importorskip('pymupdf')
-    doc = pymupdf.open()
+    from tests.pdf_factory import Document
+    doc = Document()
     page = doc.new_page()
     page.insert_text((50, 100), 'Resolved issues', fontsize=27)
     page.insert_text((50, 150), 'Proxy', fontsize=21)
@@ -50,7 +50,7 @@ def test_wrapped_comma_separated_ids_stay_with_one_description(tmp_path, monkeyp
     path = tmp_path / 'fortios-v7.2.8-release-notes.pdf'
     doc.save(path)
     doc.close()
-    monkeypatch.setattr(pdf_parser, 'PYMUPDF4LLM_AVAILABLE', False)
+    monkeypatch.setattr(pdf_parser, 'RICH_MARKDOWN_ENABLED', False)
     _, data, _, _, _ = pdf_parser.parse_pdf(path)
     assert data['resolved-issues'] == [{
         'category': 'Proxy', 'Bug ID': '727629, 901296',

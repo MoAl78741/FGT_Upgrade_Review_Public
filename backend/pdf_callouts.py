@@ -9,13 +9,13 @@ def _text(block):
 
 
 def add_callouts(pdf_path,data,notices,section_pages,notice_pages):
-    import pymupdf
+    from .pdf_document import open_document, Rect
     cache={}
-    with pymupdf.open(pdf_path) as doc:
+    with open_document(pdf_path) as doc:
         def regions(number):
             if number in cache:return cache[number]
             page=doc[number]
-            images=[pymupdf.Rect(image['bbox']) for image in page.get_image_info()]
+            images=[Rect(image['bbox']) for image in page.get_image_info()]
             images=[rect for rect in images if 10<rect.width<70 and 10<rect.height<90 and rect.x0<page.rect.width/3 and rect.y0>65]
             if not images:
                 cache[number]=[];return []

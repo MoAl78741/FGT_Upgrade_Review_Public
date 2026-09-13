@@ -27,15 +27,10 @@ try:
 except ImportError:
     PDF_AVAILABLE = False
 
-try:
-    import pymupdf4llm as _pymupdf4llm
-    # Release notes already contain selectable text. Avoid OCR / model-based
-    # layout inference, which is unnecessary and costly for these documents.
-    if hasattr(_pymupdf4llm, "use_layout"):
-        _pymupdf4llm.use_layout(False)
-    PYMUPDF4LLM_AVAILABLE = True
-except ImportError:
-    PYMUPDF4LLM_AVAILABLE = False
+from .pdf_document import pdf_session, plumber_document
+from .pdf_markdown import page_markdown, header_info as detect_headers
+RICH_MARKDOWN_ENABLED = True
+
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -684,9 +679,9 @@ def _add_bookmarked_sections(pdf_path, version_data, section_pages):
     Descendants of issue chapters are categories, not independent rich sections.
     Truncated or ambiguous bookmark labels cannot safely rename extracted text.
     """
-    import pymupdf
+    from .pdf_document import open_document, Rect
     from collections import Counter
-    with pymupdf.open(str(pdf_path)) as doc:
+    with open_document(str(pdf_path)) as doc:
         toc = doc.get_toc()
         counts = Counter(_title_to_slug(title) for _, title, _ in toc)
         ancestors = []
@@ -737,12 +732,12 @@ def _repair_link_spans(markdown, anchors):
 
 
 def _extract_page_markdown(pdf_path, page_number, *, document=None, header_info=None):
-    import pymupdf
+    from .pdf_document import open_document, Rect
     if document is None:
-        with pymupdf.open(str(pdf_path)) as opened:
+        with open_document(str(pdf_path)) as opened:
             return _extract_page_markdown(pdf_path, page_number, document=opened,
                                           header_info=header_info)
-    markdown = _pymupdf4llm.to_markdown(document, pages=[page_number], hdr_info=header_info)
+    markdown = page_markdown(document, page_number, header_info)
     page = document[page_number]
     anchors = [(link["uri"], page.get_textbox(link["from"]))
                for link in page.get_links() if link.get("uri")]
@@ -822,6 +817,7 @@ def _pair_issue_descriptions(
     return result
 
 
+@pdf_session
 def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict, dict]:
     """
     Parse a FortiGate release notes PDF.
@@ -841,8 +837,8 @@ def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict,
     version: Optional[str] = detect_version_from_filename(pdf_path.name)
 
     # This document's top-level bookmarks also define chapters with new names.
-    import pymupdf
-    with pymupdf.open(pdf_path) as document:
+    from .pdf_document import open_document, Rect
+    with open_document(pdf_path) as document:
         outline = document.get_toc()
     root_level = min((entry[0] for entry in outline), default=1)
     document_chapters = {" ".join(title.split()).casefold(): (_match_section(title) or _title_to_slug(title))
@@ -890,7 +886,7 @@ def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict,
             if current_page_num not in lst:
                 lst.append(current_page_num)
 
-    with pdfplumber.open(str(pdf_path)) as pdf:
+    with plumber_document(pdf_path) as pdf:
         if not version and pdf.pages:
             version = detect_version_from_text(pdf.pages[0].extract_text() or "")
 
@@ -1500,20 +1496,17 @@ def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict,
                 notice["blocks"] = blocks[1:] if blocks[0].get("type") == "heading" else blocks
             special_notices.append(notice)
 
-    # ── Upgrade rich sections and notices to markdown via pymupdf4llm ─────────
-    # pymupdf4llm extracts proper GFM markdown (headings, tables, code blocks,
-    # lists) from specific page ranges — far more accurate than the pdfplumber
-    # block extraction above, and searchable unlike the old PNG image approach.
+    # Build rich Markdown from the same job-local pdfplumber page geometry.
     if progress:
         progress('formatting')
-    if PYMUPDF4LLM_AVAILABLE:
+    if RICH_MARKDOWN_ENABLED:
         _add_bookmarked_sections(pdf_path, version_data, section_pages)
-        import pymupdf
+        from .pdf_document import open_document, Rect
         # Header detection scans the entire document. Reuse its result and the
         # open document across pages, preserving the same document-wide rules.
-        with pymupdf.open(str(pdf_path)) as document:
+        with open_document(str(pdf_path)) as document:
             try:
-                header_info = _pymupdf4llm.IdentifyHeaders(document)
+                header_info = detect_headers(document)
             except Exception:
                 header_info = None  # Keep the existing per-section fallback.
             # Extract each page once. A page can contain several notices, so assigning
@@ -1548,8 +1541,8 @@ def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict,
     add_issue_markdown(pdf_path, version_data)
     from .pdf_table_format import add_table_formatting
     from .pdf_table_lists import add_table_lists, _native_section_pages
-    import pymupdf
-    with pymupdf.open(pdf_path) as document:
+    from .pdf_document import open_document, Rect
+    with open_document(pdf_path) as document:
         section_pages = _native_section_pages(document, version_data, section_pages)
     add_table_formatting(pdf_path, version_data, section_pages)
     from .pdf_callouts import add_callouts
@@ -1561,5 +1554,11 @@ def parse_pdf(pdf_path, progress=None) -> tuple[Optional[str], dict, list, dict,
     add_prose_formatting(pdf_path, version_data, section_pages)
     from .pdf_heading_levels import align_heading_levels
     align_heading_levels(pdf_path, version_data)
+    # Structured tables preserve cell and span semantics without a second,
+    # competing Markdown representation of the same content.
+    for section in version_data.values():
+        if (isinstance(section, dict) and section.get('blocks')
+                and all(block.get('type') == 'table' for block in section['blocks'])):
+            section.pop('markdown', None)
     sync_notice_formatting(version_data, special_notices)
     return version, version_data, special_notices, section_pages, notice_pages

@@ -186,11 +186,8 @@ def add_issue_markdown(pdf_path, data):
     Chapter bounds keep repeated text associated with the right source section.
     Unmatched descriptions retain their existing text for inspection.
     """
-    try:
-        import pymupdf
-    except ImportError:
-        return
-    with pymupdf.open(pdf_path) as doc:
+    from .pdf_document import open_document
+    with open_document(pdf_path) as doc:
         chapters = [entry for entry in doc.get_toc() if entry[0] == 1]
         bounds = {}
         for i, (_, title, start) in enumerate(chapters):

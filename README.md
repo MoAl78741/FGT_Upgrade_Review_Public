@@ -71,3 +71,7 @@ Installation operators can download encrypted settings backups, preview and appl
 ## Current workflow
 
 Start with an upload or the synthetic example, then use the report library to search and name your work. Review drafts have navigation protection; selected findings support previewed bulk decisions. Export previews and downloadable session archives help you verify and retain results. See [the changelog](CHANGELOG.md) and [API guide](API_GUIDE.md).
+
+## Offline dependency bundle
+
+PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.

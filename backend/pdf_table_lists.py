@@ -85,8 +85,8 @@ def _merge_native_fragments(blocks, row_pages):
 
 
 def add_table_lists(pdf_path, data, section_pages):
-    import pymupdf
-    with pymupdf.open(pdf_path) as document:
+    from .pdf_document import open_document, Rect
+    with open_document(pdf_path) as document:
         section_pages = _native_section_pages(document, data, section_pages)
         cache = {}
         for key, section in data.items():

@@ -155,7 +155,7 @@ def parse_isolated(job_id, path, deadline):
 
 
 def run_pdf(job_id):
-    from fgt_upgrade.constants import CONTENT_REVISION
+    from fgt_upgrade.constants import PDF_PARSER_REVISION
     with SessionLocal() as db:
         job = db.get(ScrapeJob, job_id)
         cfg = attempt(job, effective(db, settings))
@@ -232,7 +232,7 @@ def run_pdf(job_id):
             dates = re.findall(r'\b20\d{2}-\d{2}-\d{2}\b', json.dumps(changelog))
             if dates:
                 revisions[version] = max(dates)
-        job.provenance_json = json.dumps({**json.loads(job.provenance_json or '{}'), 'source': 'pdf', 'parser_revision': CONTENT_REVISION,
+        job.provenance_json = json.dumps({**json.loads(job.provenance_json or '{}'), 'source': 'pdf', 'parser_revision': PDF_PARSER_REVISION,
             'document_revision': '; '.join(f'{v}: change log through {d}' for v, d in revisions.items()) or 'Not detected; see source change log.',
             'section_policy': 'Absent sections are not evidence of no changes.'})
         job.completed_at = datetime.utcnow()

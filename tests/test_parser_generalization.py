@@ -4,7 +4,7 @@ The 99.x versions below are synthetic labels, not claims about Fortinet releases
 """
 from types import SimpleNamespace
 import pytest
-import pymupdf
+from tests.pdf_factory import Document
 from backend import pdf_parser
 from fgt_upgrade.scraper_full import scrape_version_full
 from fgt_upgrade.scraper_requests import scrape_all
@@ -14,7 +14,7 @@ from fgt_upgrade.scraper_requests import scrape_all
 @pytest.mark.parametrize('title', ['Future platform support', 'New operational constraints'])
 def test_unseen_pdf_chapter_and_category_follow_outline(tmp_path, monkeypatch, version, title):
     path = tmp_path / 'unrelated-upload-name.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page()
     page.insert_text((50, 100), f'FortiOS {version}', fontsize=18)
     page.insert_text((50, 150), 'Release Notes', fontsize=12)
@@ -34,7 +34,7 @@ def test_unseen_pdf_chapter_and_category_follow_outline(tmp_path, monkeypatch, v
         page.insert_text((x, y), text, fontsize=10)
     doc.set_toc([[1, title, 2], [1, 'Resolved issues', 3], [2, 'Upgrade information', 3]])
     doc.save(path); doc.close()
-    monkeypatch.setattr(pdf_parser, 'PYMUPDF4LLM_AVAILABLE', False)
+    monkeypatch.setattr(pdf_parser, 'RICH_MARKDOWN_ENABLED', False)
     detected, data, *_ = pdf_parser.parse_pdf(path)
     assert detected == version
     assert 'previously unseen chapter' in str(data[pdf_parser._title_to_slug(title)])
@@ -44,7 +44,7 @@ def test_unseen_pdf_chapter_and_category_follow_outline(tmp_path, monkeypatch, v
 
 def test_bookmark_recovery_is_not_a_section_title_allowlist(tmp_path):
     path = tmp_path / 'outline.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     for _ in range(4): doc.new_page()
     doc.set_toc([[1, 'Unfamiliar chapter', 1], [2, 'Novel support matrix', 2],
                  [1, 'Known issues', 3], [2, 'Unfamiliar category', 3],
@@ -121,7 +121,7 @@ def test_browser_fetch_failures_are_explicit(result):
 def test_continuation_geometry_is_not_tied_to_one_page_template(tmp_path, top, height):
     from backend.pdf_table_continuations import restore_table_continuations
     path = tmp_path / 'another-layout.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page(width=650, height=height)
     page.insert_text((60, height - 100), 'Previous'); page.insert_text((240, height - 100), 'Value')
     page = doc.new_page(width=650, height=height)

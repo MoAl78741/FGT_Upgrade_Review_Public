@@ -2,7 +2,7 @@
 
 Selected license: **GNU AGPL version 3 or later**, SPDX `AGPL-3.0-or-later`. The full license is in [LICENSE](../LICENSE).
 
-This preserves the existing application's license and fits its AGPL versions of PyMuPDF and PyMuPDF4LLM. It permits commercial use, paid hosting, installation, and support; it is not a noncommercial restriction and does not prevent competing services.
+This preserves the existing application's license. The PDF pipeline now uses MIT/BSD/Apache components; removing its former engine does not itself change the application license. It permits commercial use, paid hosting, installation, and support; it is not a noncommercial restriction and does not prevent competing services.
 
 Distribution carries corresponding-source and notice obligations. Modified network-accessible versions must offer their users the corresponding source as required by section 13. A private GitHub repository does not exempt software delivered to customers or used as a covered service. Source may need to be supplied to recipients/users even when development happens privately.
 

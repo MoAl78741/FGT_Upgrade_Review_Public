@@ -4,9 +4,9 @@ from .pdf_issue_markdown import _normalized
 
 
 def align_heading_levels(pdf_path, data):
-    import pymupdf
+    from .pdf_document import open_document, Rect
     levels = {}
-    with pymupdf.open(pdf_path) as document:
+    with open_document(pdf_path) as document:
         for level, title, _ in document.get_toc():
             levels.setdefault(_normalized(title), set()).add(min(6, max(1, level)))
     unique = {title: next(iter(values)) for title, values in levels.items() if len(values) == 1}

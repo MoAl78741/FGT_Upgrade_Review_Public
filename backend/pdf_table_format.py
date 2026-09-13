@@ -25,8 +25,8 @@ def _cell_code_markdown(lines):
 
 
 def add_table_formatting(pdf_path, data, section_pages):
-    import pymupdf
-    with pymupdf.open(pdf_path) as document:
+    from .pdf_document import open_document, Rect
+    with open_document(pdf_path) as document:
         page_cache = {}
         for key, section in data.items():
             if not isinstance(section, dict):

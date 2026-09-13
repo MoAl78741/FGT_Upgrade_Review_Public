@@ -16,7 +16,8 @@ def main():
     metadata_only = '--metadata-only' in sys.argv[3:]
     if not metadata_only:
         from backend.pdf_parser import parse_pdf
-    import pymupdf
+    import pypdfium2 as pdfium
+    from pypdfium2 import raw as pdfium_raw
     from backend.parser_sandbox import confine
     root = Path(__file__).resolve().parent.parent
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
@@ -31,9 +32,15 @@ def main():
         Path(sys.prefix), Path(sys.base_prefix), root / 'backend', root / 'fgt_upgrade'])
     page_count = None
     try:
-        with pymupdf.open(source) as document:
+        try:
+            document = pdfium.PdfDocument(str(source))
+        except pdfium.PdfiumError as exc:
+            if exc.err_code == pdfium_raw.FPDF_ERR_PASSWORD:
+                raise ValueError('Encrypted PDFs are not supported; export an unencrypted release-note PDF.') from exc
+            raise ValueError('Invalid or damaged PDF. Download the original release-note PDF and try again.') from exc
+        with document:
             page_count = len(document)
-            if document.needs_pass:
+            if pdfium_raw.FPDF_GetSecurityHandlerRevision(document) >= 0:
                 raise ValueError('Encrypted PDFs are not supported; export an unencrypted release-note PDF.')
             if len(document) > int(os.environ['MAX_PDF_PAGES']):
                 raise ValueError('PDF exceeds the page limit.')

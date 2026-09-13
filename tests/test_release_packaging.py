@@ -25,6 +25,7 @@ def test_edition_archives_are_complete_reproducible_and_exclude_runtime(tmp_path
             assert all(m.isfile() and not Path(m.name).is_absolute() and '..' not in Path(m.name).parts for m in members)
             assert not any(n.endswith(('.db', '.pdf', '.pyc')) or '/node_modules/' in n or n.startswith(('uploads/', 'data/')) for n in names)
             assert not any(Path(n).name.startswith('.env') for n in names)
+            assert not any(n.startswith('tests/golden/') for n in names)
             for required in ('Dockerfile', 'requirements.lock', 'frontend/package-lock.json', 'backend/main.py', 'frontend/src/main.tsx', 'LICENSE', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'backend/maintenance.py', 'START-HERE.md', 'releases/public.env.example', 'compose.public.yml'):
                 assert required in names
             manifest = json.load(tar.extractfile(names['RELEASE-MANIFEST.json']))

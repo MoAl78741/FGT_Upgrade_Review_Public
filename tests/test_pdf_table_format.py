@@ -1,4 +1,4 @@
-import pymupdf
+from tests.pdf_factory import Document
 import pytest
 from backend.pdf_table_format import add_table_formatting
 
@@ -6,7 +6,7 @@ from backend.pdf_table_format import add_table_formatting
 @pytest.mark.parametrize('headers', [('Before upgrade', 'After upgrade'), ('Old syntax', 'New syntax'), ('Example A', 'Example B')])
 @pytest.mark.parametrize('command', ['config', 'show', 'get'])
 def test_cli_cells_retain_source_rows_and_column_order(tmp_path, headers, command):
-    path=tmp_path/'commands.pdf';doc=pymupdf.open();page=doc.new_page(width=612,height=792)
+    path=tmp_path/'commands.pdf';doc=Document();page=doc.new_page(width=612,height=792)
     page.draw_rect((50,90,550,310));page.draw_line((300,90),(300,310))
     for y in [120,215]:page.draw_line((50,y),(550,y))
     page.insert_text((60,110),headers[0],fontsize=10);page.insert_text((310,110),headers[1],fontsize=10)
