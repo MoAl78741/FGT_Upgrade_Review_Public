@@ -45,7 +45,7 @@ def test_worker_has_only_its_stage_and_no_secrets_or_host_privilege():
     assert host['CapDrop']==['ALL'] and host['SecurityOpt']==['no-new-privileges:true']
     assert host['Memory']==host['MemorySwap']==2*1024**3
     assert host['PidsLimit']==64 and host['NanoCpus']==1000000000
-    assert host['Mounts']==[{'Type':'bind','Source':'/volume/run','Target':'/job','ReadOnly':False,'BindOptions':{'Propagation':'rprivate'}}]
+    assert host['Mounts']==[{'Type':'bind','Source':'/volume/run','Target':'/job','ReadOnly':False,'BindOptions':{'Propagation':'rslave'}}]
     assert not any('PASSWORD' in item or 'DB_PATH' in item or 'RUNNER' in item for item in spec['Env'])
     assert host['RestartPolicy']=={'Name':'no'} and host['LogConfig']=={'Type':'none'}
 

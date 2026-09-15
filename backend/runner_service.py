@@ -71,7 +71,7 @@ def worker_spec(image, host_path, identity, run_id, data, memory):
             'NanoCpus': 1000000000, 'RestartPolicy': {'Name': 'no'},
             'LogConfig': {'Type': 'none'},
             'Mounts': [{'Type': 'bind', 'Source': host_path, 'Target': '/job',
-                        'ReadOnly': False, 'BindOptions': {'Propagation': 'rprivate'}}],
+                        'ReadOnly': False, 'BindOptions': {'Propagation': 'rslave'}}],
             'Ulimits': [{'Name': 'core', 'Soft': 0, 'Hard': 0},
                         {'Name': 'nofile', 'Soft': 128, 'Hard': 128}],
         },
