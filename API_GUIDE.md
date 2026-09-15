@@ -177,3 +177,8 @@ The former private product is now **Pro**. Compatibility identifiers (`APP_EDITI
 Review edits show Unsaved/Saving/Saved status. Navigation and filtering/pagination warn before losing drafts; exports and completion require saved edits. Bulk changes require selecting findings and previewing the affected list. The example report is synthetic and creates no server records.
 
 Existing encrypted v3 backups without the new report-title column remain accepted; the missing title defaults to blank. Unknown schema differences remain rejected.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.

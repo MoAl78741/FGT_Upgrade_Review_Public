@@ -17,6 +17,7 @@ from .models import ScrapeJob, BrowserSession, Review, TeamSession
 from .settings import settings
 from .processing_settings import effective, attempt
 from .file_metrics import stamp, elapsed, pending_file, finish_files
+from .container_worker import ContainerProcess
 
 ROOT = Path(__file__).resolve().parent.parent
 STOP = threading.Event()
@@ -56,7 +57,10 @@ def terminate(job_id):
     with LOCK:
         process = CHILDREN.get(job_id)
         if process and process.poll() is None:
-            os.killpg(process.pid, signal.SIGKILL)
+            if isinstance(process, ContainerProcess):
+                process.kill()
+            else:
+                os.killpg(process.pid, signal.SIGKILL)
             process.wait(timeout=10)
 
 
@@ -90,8 +94,12 @@ def parse_isolated(job_id, path, deadline):
             current = check.get(ScrapeJob, job_id)
             if not current or current.status != 'running':
                 raise RuntimeError('Job cancelled')
-        process = subprocess.Popen(command, cwd=ROOT, env=env, stdin=subprocess.DEVNULL,
-                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        from .container_worker import enabled, ContainerProcess
+        if enabled():
+            process = ContainerProcess(job_id, path, output, min(cfg.timeout, max(1, deadline-time.monotonic())), cfg.max_pages)
+        else:
+            process = subprocess.Popen(command, cwd=ROOT, env=env, stdin=subprocess.DEVNULL,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         CHILDREN[job_id] = process
     try:
         last_progress = None
@@ -147,6 +155,8 @@ def parse_isolated(job_id, path, deadline):
         terminate(job_id)
         raise RuntimeError('Processing exceeded the time limit.')
     finally:
+        if isinstance(process, ContainerProcess):
+            process.kill()
         with LOCK:
             CHILDREN.pop(job_id, None)
         output.unlink(missing_ok=True)
@@ -340,6 +350,8 @@ def start():
         from .restore_journal import recover
         recover(DB_PATH)
         initialize_database()
+        from .container_worker import recover as recover_workers
+        recover_workers()
     except BaseException:
         LEASE.close(); LEASE = None
         raise

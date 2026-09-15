@@ -70,3 +70,8 @@ See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/
 ## Offline dependency bundle
 
 PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.

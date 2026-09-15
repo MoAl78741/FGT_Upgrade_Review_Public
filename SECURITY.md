@@ -82,3 +82,8 @@ dependencies with networking disabled. Run `scripts/audit_pdf_dependencies.py`
 inside the final image and `python -m backend.sandbox_check`; the latter must
 still deny network and sibling-job file access. No optional legacy engine is
 installed. Re-run advisory scanning for the actual image before release.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.
