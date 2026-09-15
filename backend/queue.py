@@ -155,13 +155,15 @@ def parse_isolated(job_id, path, deadline):
         terminate(job_id)
         raise RuntimeError('Processing exceeded the time limit.')
     finally:
-        if isinstance(process, ContainerProcess):
-            process.kill()
-        with LOCK:
-            CHILDREN.pop(job_id, None)
-        output.unlink(missing_ok=True)
-        progress_path.unlink(missing_ok=True)
-        progress_path.with_suffix('.tmp').unlink(missing_ok=True)
+        try:
+            if isinstance(process, ContainerProcess):
+                process.kill()
+        finally:
+            with LOCK:
+                CHILDREN.pop(job_id, None)
+            output.unlink(missing_ok=True)
+            progress_path.unlink(missing_ok=True)
+            progress_path.with_suffix('.tmp').unlink(missing_ok=True)
 
 
 def run_pdf(job_id):

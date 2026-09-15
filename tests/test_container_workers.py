@@ -89,3 +89,13 @@ def test_reset_only_touches_this_installations_workers(tmp_path):
     runner.reset()
     assert 'io.fgt.pdf-runner' in calls[0][1] and 'public' in calls[0][1]
     assert calls[1]==('DELETE','/containers/one?force=true&v=true')
+
+
+def test_container_health_fails_when_runner_is_unavailable(monkeypatch):
+    import io
+    from backend import healthcheck, worker_transport
+    monkeypatch.setenv('PDF_WORKER_BACKEND','container')
+    monkeypatch.setattr(healthcheck,'urlopen',lambda *a,**kw:io.BytesIO(b'{"status":"ok"}'))
+    def unavailable(*a,**kw):raise RuntimeError('Runner unavailable')
+    monkeypatch.setattr(worker_transport,'request',unavailable)
+    with pytest.raises(RuntimeError,match='Runner unavailable'):healthcheck.main()
