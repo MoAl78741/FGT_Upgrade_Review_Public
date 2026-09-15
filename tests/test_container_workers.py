@@ -38,7 +38,10 @@ def test_rejects_links_and_special_files(tmp_path):
 
 
 def test_worker_has_only_its_stage_and_no_secrets_or_host_privilege():
-    spec=worker_spec('sha256:verified','/volume/run','public','run',payload(),2*1024**3)
+    data=payload()
+    spec=worker_spec('sha256:verified','/volume/run','public','run',data,2*1024**3)
+    assert spec['Cmd'][0]=='/job/'+data['filename']  # Preserve parser filename fallback.
+    assert spec['Healthcheck']=={'Test':['NONE']}
     host=spec['HostConfig']
     assert spec['NetworkDisabled'] and host['NetworkMode']=='none'
     assert spec['User']=='10001:10001' and host['ReadonlyRootfs']

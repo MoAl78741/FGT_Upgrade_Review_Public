@@ -57,7 +57,8 @@ def worker_spec(image, host_path, identity, run_id, data, memory):
     return {
         'Image': image, 'User': '10001:10001', 'WorkingDir': '/job',
         'Entrypoint': ['python', '-m', 'backend.parse_process'],
-        'Cmd': ['/job/input.pdf', '/job/result.json'],
+        'Cmd': ['/job/' + data['filename'], '/job/result.json'],
+        'Healthcheck': {'Test': ['NONE']},
         'Env': ['PYTHONPATH=/app', 'PYTHONDONTWRITEBYTECODE=1',
                 'FGT_CONTAINER_WORKER=1', 'HOME=/job', 'TMPDIR=/job',
                 f'JOB_TIMEOUT_SECONDS={data["timeout"]}', f'MAX_PDF_PAGES={data["max_pages"]}',
@@ -134,7 +135,7 @@ class Runner:
             os.chown(stage, 10001, 10001)
             container_id = None
             try:
-                for name, content in [('input.pdf', pdf), ('pack.json', pack)]:
+                for name, content in [(data['filename'], pdf), ('pack.json', pack)]:
                     if content is not None:
                         (stage/name).write_bytes(content)
                         os.chown(stage/name, 10001, 10001)
@@ -142,7 +143,8 @@ class Runner:
                 config = worker_spec(self.image, self.host_state + '/' + key, self.identity, key, data, self.memory)
                 container_id = self.docker('POST', '/containers/create', config)['Id']
                 self.docker('POST', '/containers/' + container_id + '/start')
-                self.runs[key] = {'container': container_id, 'deadline': time.monotonic()+data['timeout'], 'stage': stage, 'done': None}
+                self.runs[key] = {'container': container_id, 'deadline': time.monotonic()+data['timeout'], 'stage': stage, 'done': None,
+                                  'progress': Path(data['filename']).with_suffix('.progress.json').name}
                 return {'id': key}
             except BaseException:
                 if container_id:
@@ -158,7 +160,7 @@ class Runner:
             if done and value['done'] is None: value['done'] = time.monotonic()
             result = {'done': done, 'exit_code': state['ExitCode'] if done else None}
             try:
-                progress = json.loads(read_file(value['stage'], 'input.progress.json', 4096))
+                progress = json.loads(read_file(value['stage'], value['progress'], 4096))
                 if (isinstance(progress, dict) and progress.get('phase') in {'reading','formatting','finalizing'}
                     and type(progress.get('pages_done')) is int and type(progress.get('total_pages')) is int
                     and 0 <= progress['pages_done'] <= progress['total_pages'] <= 2000):
