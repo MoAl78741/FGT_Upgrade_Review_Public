@@ -97,3 +97,24 @@ def test_distributed_suite_fingerprints_source_without_git(tmp_path,monkeypatch)
     assert check.fingerprint()==sealed
     source.write_text('Another source change')
     assert check.fingerprint()!=sealed
+
+
+def test_release_pipeline_requires_both_checks_and_correct_edition():
+    import yaml
+    # BaseLoader keeps YAML's `on` key as a string instead of YAML 1.1 boolean True.
+    workflows=ROOT/'.github/workflows'
+    release=yaml.load((workflows/'release.yml').read_text(),Loader=yaml.BaseLoader)
+    jobs=release['jobs']
+    assert set(jobs['bundles']['needs'])=={'regression','security'}
+    assert 'if' not in jobs['bundles'], 'Never override the default successful-dependencies gate'
+    for name in ('regression','security'):
+        assert jobs[name]['uses']==f'./.github/workflows/{name}.yml'
+        reusable=yaml.load((workflows/f'{name}.yml').read_text(),Loader=yaml.BaseLoader)
+        assert 'workflow_call' in reusable['on']
+        assert '${{ github.workflow }}' in reusable['concurrency']['group']
+    text=(workflows/'release.yml').read_text()
+    edition=(ROOT/'EDITION').read_text().strip()
+    image='pro' if edition=='private' else 'public'
+    assert f'fgt-upgrade-review-${{VERSION}}-{edition}.tar.gz' in text
+    assert f'fgt-upgrade-review-{image}:${{VERSION}}' in text
+    assert 'continue-on-error' not in text

@@ -100,3 +100,11 @@ When a failure occurs, read the failed stage log first. For UI failures open the
 | security | Cross-session denial, CSRF/origin/host checks, export injection and no config endpoint | `test_security.py`, `test_content_parity.py`, `test_presentation_api.py` |
 | feature_gates | Optional module discovery and server-enforced dependency rules | `test_usability.py` |
 | suite_infrastructure | Coverage drift, safe test boundaries and release packaging classification | `test_suite_contract.py` |
+
+## GitHub CI/CD gates
+
+`regression.yml` runs the full suite on every push and pull request, or manually from Actions. Logs, JUnit, screenshots and browser traces are retained for 14 days. `security.yml` independently checks dependency advisories, the offline image build, excluded PDF engines, the container sandbox and Trivy; it also runs weekly.
+
+`release.yml` runs on `main` pushes or manual dispatch. It calls those same reusable workflows at the current commit and will build/upload the edition's source-and-image bundle only if **both** succeed. It checks packaging, builds from the generated source archive, and verifies checksums. Build numbers include the workflow run and attempt. No registry push, GitHub release publication, SSH connection, or Portainer rollout is enabled. Production deployments therefore remain unchanged.
+
+The release pipeline retains the image security gate: current base-image scan findings must be resolved or explicitly triaged before an artifact can pass that gate. Private publisher corpus replays remain separate operator-run release checks described above; confidential PDFs are not uploaded to ordinary GitHub runners. Branch protection rules are not modified by these workflow files; repository administrators can make `regression / regression` and `security / tests` required checks using the names shown by GitHub.
