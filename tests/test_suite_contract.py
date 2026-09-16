@@ -83,3 +83,17 @@ def test_frontend_source_is_not_hidden_from_clean_checkouts():
     result=subprocess.run(['git','check-ignore','--stdin'],cwd=ROOT,input='\n'.join(sources)+'\n',text=True,capture_output=True)
     assert result.returncode in (0,1),result.stderr
     assert not result.stdout.strip(), 'Frontend source excluded from Git: '+result.stdout
+
+
+def test_distributed_suite_fingerprints_source_without_git(tmp_path,monkeypatch):
+    from scripts import check
+    monkeypatch.setattr(check,'ROOT',tmp_path)
+    source=tmp_path/'README.md';source.write_text('Reviewed source')
+    plain=check.fingerprint();source.write_text('Changed source')
+    assert check.fingerprint()!=plain
+    (tmp_path/'RELEASE-MANIFEST.json').write_text(json.dumps({'files':{'README.md':'seal'}}))
+    sealed=check.fingerprint()
+    results=tmp_path/'test-results';results.mkdir();(results/'run.log').write_text('Generated diagnostics')
+    assert check.fingerprint()==sealed
+    source.write_text('Another source change')
+    assert check.fingerprint()!=sealed
