@@ -118,3 +118,27 @@ def test_release_pipeline_requires_both_checks_and_correct_edition():
     assert f'fgt-upgrade-review-${{VERSION}}-{edition}.tar.gz' in text
     assert f'fgt-upgrade-review-{image}:${{VERSION}}' in text
     assert 'continue-on-error' not in text
+
+
+def test_image_scan_preserves_unfixed_inventory_and_blocks_fixable_findings():
+    import yaml
+    workflow=yaml.load((ROOT/'.github/workflows/security.yml').read_text(),Loader=yaml.BaseLoader)
+    steps=workflow['jobs']['tests']['steps']
+    scans=[step for step in steps if step.get('uses','').startswith('aquasecurity/trivy-action@')]
+    assert len(scans)==2
+    inventory,gate=scans
+    assert inventory['with']['ignore-unfixed']=='false'
+    assert inventory['with']['exit-code']=='0'
+    assert set(inventory['with']['severity'].split(','))=={'UNKNOWN','LOW','MEDIUM','HIGH','CRITICAL'}
+    assert inventory['with']['format']=='json'
+    assert gate['with']['ignore-unfixed']=='true'
+    assert gate['with']['exit-code']=='1'
+    assert set(gate['with']['severity'].split(','))=={'HIGH','CRITICAL'}
+    assert inventory['with']['image-ref']==gate['with']['image-ref']
+    for step in (inventory,gate):
+        assert 'continue-on-error' not in step and 'if' not in step
+    artifact=next(step for step in steps if step.get('with',{}).get('name')=='image-vulnerability-inventory')
+    assert artifact['with']['path']==inventory['with']['output']
+    assert artifact['if']=='always()'
+    assert artifact['with']['if-no-files-found']=='error'
+    assert steps.index(inventory)<steps.index(artifact)<steps.index(gate)

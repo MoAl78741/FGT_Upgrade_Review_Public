@@ -39,9 +39,30 @@ jobs:
       - run: docker build --platform linux/amd64 --network=none -t fgt-upgrade-review:ci .
       - run: docker run --rm --network none -v "$PWD/scripts/audit_pdf_dependencies.py:/audit.py:ro" fgt-upgrade-review:ci python /audit.py
       - run: docker run --rm --cap-drop ALL --security-opt no-new-privileges fgt-upgrade-review:ci python -m backend.sandbox_check
-      - uses: aquasecurity/trivy-action@0.35.0
+      - name: Record complete image vulnerability inventory
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: fgt-upgrade-review:ci
+          scanners: vuln
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: '0'
+          format: json
+          output: trivy-inventory.json
+      - name: Retain image vulnerability inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-vulnerability-inventory
+          path: trivy-inventory.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Block fixable high and critical image vulnerabilities
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: fgt-upgrade-review:ci
+          scanners: vuln
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
           exit-code: '1'
           format: table
