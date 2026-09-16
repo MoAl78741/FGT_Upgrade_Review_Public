@@ -1,5 +1,11 @@
 # Security release status
 
+## Current CI policy — 2026-09-16
+
+The release gate blocks HIGH and CRITICAL image vulnerabilities for which Trivy reports an available fix (`ignore-unfixed: true`). A separate JSON inventory includes all severities and unfixed findings and is retained as the `image-vulnerability-inventory` Actions artifact for 30 days. Scanner errors remain failures; dependency audits and sandbox checks remain required. Unfixed findings are accepted for this automated gate, not declared harmless or resolved. Weekly scans re-evaluate availability of fixes. Historical counts and triage below describe earlier scans, not the current gate policy or a current vulnerability count.
+
+See [Trivy filtering semantics](https://trivy.dev/docs/dev/configuration/filtering/) and [runtime package review](docs/RUNTIME_PACKAGES.md).
+
 Updated locally on 2026-09-11. Public and private application workflows have been functionally validated. Known base-image advisories remain visible; this is a targeted application review, not an independent penetration test or clearance for an Internet-hosted launch.
 
 ## Completed validation
