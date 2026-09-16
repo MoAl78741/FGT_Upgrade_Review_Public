@@ -80,3 +80,7 @@ PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](do
 ## Photon OS and container PDF workers
 
 For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.
+
+### Export integrity and retained sources
+
+Reports distinguish successful extraction from availability of the original PDF. Session archives include JSON/HTML from the same snapshot, available originals, and a checksum manifest that calls out missing sources and unfinished imports. Source wording and original JSON remain unchanged. See [data consistency regression checks](docs/DEVELOPMENT.md#data-consistency-regression-checks).

@@ -1,3 +1,4 @@
+import {resolvedDisplayJob} from '../utils/sectionAliases';
 import {useTeam} from '../contexts/TeamContext';
 import { groupContent, consolidationKeys } from "../utils/consolidation";
 import { ConsolidationProvider, ConsolidateCheckbox, useConsolidation } from "../contexts/ConsolidationContext";
@@ -94,7 +95,7 @@ function ReportContent() {
     },
   });
 
-  const job = storedJob ? {...storedJob, localRelevance: profile, localConsolidation: consolidatedSections} : undefined;
+  const job = storedJob ? {...resolvedDisplayJob(storedJob), localRelevance: profile, localConsolidation: consolidatedSections} : undefined;
 
   // ── All derived state and hooks must come before any early returns ──────────
   // (Rules of Hooks: hook call count must be identical on every render)
@@ -117,6 +118,7 @@ function ReportContent() {
           seen.set(key, { label: !Array.isArray(val) && typeof val === "object" && val && "title" in val ? String(val.title) : slugLabel(key), isIssues: isIssuesData(val), totalCount: 0 });
         }
         if (isIssuesData(val)) {
+          seen.get(key)!.isIssues = true;
           seen.get(key)!.totalCount += (val as KnownIssue[]).length;
         }
       }

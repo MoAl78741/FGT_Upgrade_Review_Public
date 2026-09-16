@@ -182,3 +182,9 @@ Existing encrypted v3 backups without the new report-title column remain accepte
 ## Photon OS and container PDF workers
 
 For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.
+
+### Retained PDF availability
+
+`GET /api/jobs/{id}` reports `file_outcomes[].source_available` for PDF imports. A completed extraction can have an unavailable original attachment; the response then contains a warning while preserving extracted content and provenance. `GET /api/jobs/{id}/files/{index}` returns 404 for an unavailable original. PDF references in review responses expose `available` for the same reason. These fields do not change extraction outcomes or review decisions.
+
+HTML exports retain legacy and current resolved-section content, as well as generic row chapters and their source formatting. Raw report JSON preserves the original section keys and coordinates. Session archives use single-response snapshots and a checksum/warning manifest; see [data consistency checks](docs/DEVELOPMENT.md#data-consistency-regression-checks).

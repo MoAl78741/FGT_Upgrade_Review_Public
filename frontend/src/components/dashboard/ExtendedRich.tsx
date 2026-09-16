@@ -1,9 +1,9 @@
+import SectionContent,{type SectionValue} from './SectionContent';
 import { richGroups } from "../../utils/consolidation";
 import { ConsolidateCheckbox, useConsolidation } from "../../contexts/ConsolidationContext";
 import { useState, useEffect } from "react";
 import { ExternalLink } from "lucide-react";
-import SourceContent, { SourceBlocks } from "./SourceContent";
-import type { JobDetail, RichSection } from "../../types";
+import type { JobDetail } from "../../types";
 
 
 interface Props {
@@ -16,8 +16,8 @@ export default function ExtendedRich({ job, slugKey }: Props) {
   const consolidate = sections.includes(slugKey);
   const versions = (job.versions ?? []).filter((v) => {
     const d = (job.all_data?.[v] as Record<string, unknown> | undefined)?.[slugKey];
-    const s = d as RichSection | undefined;
-    return !!(s?.markdown || s?.blocks?.length);
+    const s = d as SectionValue | undefined;
+    return !!(s && (Array.isArray(s) ? s.length : s.markdown || s.blocks?.length));
   });
 
   const [selected, setSelected] = useState<string>(versions[0] ?? "");
@@ -41,12 +41,12 @@ export default function ExtendedRich({ job, slugKey }: Props) {
     {richGroups(job, slugKey, true).map(({item: {section}, versions: builds}, i) =>
       <div key={i} className="bg-navy-800 border border-navy-700 rounded-xl px-6 py-5">
         <p className="text-sm font-mono text-gray-400 mb-3">Builds: {builds.join(', ')}</p>
-        {section.markdown ? <SourceContent markdown={section.markdown} /> : <SourceBlocks blocks={section.blocks} />}
+        <SectionContent value={section} />
       </div>)}
   </div>;
 
   const versionData = (job.all_data?.[selected] as Record<string, unknown> | undefined);
-  const section = versionData?.[slugKey] as RichSection | undefined;
+  const section = versionData?.[slugKey] as SectionValue | undefined;
   const sourceUrl = (versionData?._section_urls as Record<string, string> | undefined)?.[slugKey];
 
   return (
@@ -84,17 +84,7 @@ export default function ExtendedRich({ job, slugKey }: Props) {
 
       {/* Content */}
       {section ? (
-        section.markdown ? (
-          /* PDF source: render extracted markdown (searchable, selectable) */
-          <div className="bg-navy-800 border border-navy-700 rounded-xl px-6 py-5">
-            <SourceContent markdown={section.markdown} />
-          </div>
-        ) : (
-          /* Scrape source: render parsed blocks */
-          <div className="bg-navy-800 border border-navy-700 rounded-xl px-6 py-5">
-            <SourceBlocks blocks={section.blocks} />
-          </div>
-        )
+        <div className="bg-navy-800 border border-navy-700 rounded-xl px-6 py-5"><SectionContent value={section}/></div>
       ) : (
         <div className="text-center text-gray-600 py-12 text-sm">
           No content for v{selected}.

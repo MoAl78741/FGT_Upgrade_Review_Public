@@ -256,3 +256,26 @@ assert(documentList.includes('02:05') && documentList.includes('17 pages'));
 console.log('Per-document time, page counts and accessible success/failure indicators passed.');
 
 import "./consolidation";
+
+// A mixed historical/new source report must not drop the singular section alias.
+const mixedResolved = {...job, versions:['7.0.1','7.2.1'], special_notices:[], all_data:{
+ '7.0.1':{'resolved-issue':[{'Bug ID':'111',Description:'Legacy resolved sentinel',markdown:'Legacy **resolved** sentinel'}]},
+ '7.2.1':{'resolved-issues':[{'Bug ID':'222',Description:'Current resolved sentinel'}]}
+}} as JobDetail;
+const untouchedResolved=JSON.stringify(mixedResolved);
+const mixedHtml=generateHtml(mixedResolved,new Set(['resolved']));
+assert.ok(mixedHtml.includes('Legacy <strong>resolved</strong> sentinel'),'Legacy alias must be exported alongside the plural section');
+assert.ok(mixedHtml.includes('Current resolved sentinel'));
+assert.equal(JSON.stringify(mixedResolved),untouchedResolved,'Rendering never rewrites source data');
+
+import './archive-integrity';
+
+import SectionContent from '../src/components/dashboard/SectionContent';
+import {richGroups} from '../src/utils/consolidation';
+const genericRows=[{'Feature ID':'GEN-1',category:'General',Description:'Generic source sentinel',markdown:'Generic **source** sentinel'}];
+const genericJob={...job,versions:['7.4.10','7.4.11'],special_notices:[],all_data:{'7.4.10':{'additional-changes':genericRows},'7.4.11':{'additional-changes':genericRows}},localConsolidation:['additional-changes']} as JobDetail;
+const genericMarkup=renderToStaticMarkup(<SectionContent value={genericRows}/>);
+assert(genericMarkup.includes('GEN-1')&&genericMarkup.includes('<strong>source</strong>'));
+assert.equal(richGroups(genericJob,'additional-changes',true).length,1);
+assert(generateHtml(genericJob,new Set(['ext:additional-changes'])).includes(genericMarkup),'Consolidating a non-issue array must retain its complete formatted source');
+assert(generateHtml({...genericJob,localConsolidation:[]},new Set(['ext:additional-changes'])).includes(genericMarkup));

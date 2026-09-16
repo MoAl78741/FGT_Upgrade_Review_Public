@@ -138,3 +138,13 @@ The original command-line dashboard remains available for compatibility:
 ```
 
 Its scraping behavior is local operator tooling. Prefer the current web/API workflow for edition controls, persistent jobs, team reviews, and current exports. Evaluate source-document terms before collecting documentation.
+
+## Data consistency regression checks
+
+Run `node frontend/tests/run-content-parity.cjs` and the Python test suite before releasing. The shared screen/export renderer must retain both legacy `resolved-issue` and current `resolved-issues` content without changing stored source JSON. Generic row chapters retain identifiers and Markdown in normal and consolidated views. Archive tests verify single-snapshot JSON/HTML, attachment hashes, unavailable attachments, and authorization failures.
+
+The legacy live harness is disabled by default. It requires all three explicit settings: `RUN_LEGACY_LIVE_API=1`, `LEGACY_API_DISPOSABLE=1`, and `LEGACY_API_URL=http://<disposable-test-server>/api`. Never point it at a development or production installation with retained reports. Tests create jobs and clean up their own IDs. Normal tests use isolated databases and clients.
+
+Detailed PDF job responses include `file_outcomes[].source_available`. PDF review references include `available`. These describe retained attachment availability, independently of successful extraction. Missing originals add response warnings without modifying saved extraction/provenance.
+
+Session ZIP exports use one response snapshot for each JSON/HTML pair, preserve available original PDFs, validate recorded PDF SHA-256 hashes, and include a `manifest.json` of entry hashes and warnings. Missing originals do not discard extracted reports. Authentication failures or checksum mismatches stop the archive. Archives with partial/unfinished reports or missing originals are explicitly marked incomplete. They are personal exports, not installation restore backups.

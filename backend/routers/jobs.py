@@ -25,6 +25,13 @@ def response(job, detail=False):
     result.provenance = json.loads(job.provenance_json or '{}')
     if job.source == 'pdf':
         result.processing_timeout_seconds = json.loads(job.request_json or '{}').get('processing', {}).get('timeout_seconds')
+    if detail and job.source == 'pdf':
+        from ..source_files import source_path
+        for index, item in enumerate(result.file_outcomes):
+            item['source_available'] = source_path(job, index, settings.uploads) is not None
+        missing = sum(item['source_available'] is False for item in result.file_outcomes)
+        if missing and job.status not in {'pending', 'running', 'uploading'}:
+            result.warnings.append(f'Original source PDF unavailable for {missing} file(s). Extracted content is retained.')
     if detail:
         result.versions = json.loads(job.versions_json or '[]')
         result.all_data = json.loads(job.all_data_json or '{}')
@@ -152,9 +159,9 @@ def source_file(job_id: str, file_index: int, db: Session = Depends(get_db), own
     if file_index < 0 or file_index >= len(files):
         raise HTTPException(404, 'Source file not found')
     item = files[file_index]
-    root = (settings.uploads / job.id).resolve()
-    path = (root / item['stored']).resolve()
-    if path.parent != root or not path.is_file() or path.suffix.lower() != '.pdf':
+    from ..source_files import source_path
+    path = source_path(job, file_index, settings.uploads)
+    if path is None:
         raise HTTPException(404, 'Source file unavailable')
     return FileResponse(path, media_type='application/pdf', filename=Path(item['name']).name,
                         content_disposition_type='inline')

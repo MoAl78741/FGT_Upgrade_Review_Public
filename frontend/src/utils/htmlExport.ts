@@ -1,3 +1,5 @@
+import SectionContent,{type SectionValue} from '../components/dashboard/SectionContent';
+import {resolvedDisplayJob} from './sectionAliases';
 import { groupRows, groupNotices, richGroups } from "./consolidation";
 import { localDateTime } from "./dateTime";
 import {exportFontCss} from "../styles/exportFonts";
@@ -5,8 +7,7 @@ import { relevance } from "../config/analyze";
 import { sourceRowId } from "./sourceRowId";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import SourceContent, { SourceBlocks, sourceContentCss } from "../components/dashboard/SourceContent";
-import type { RichSection } from "../types";
+import SourceContent, { sourceContentCss } from "../components/dashboard/SourceContent";
 
 const contentHtml = (markdown?: string, text = "") => renderToStaticMarkup(createElement(SourceContent, { markdown, text }));
 import type { JobDetail, TableItem, Feature, KnownIssue } from "../types";
@@ -444,8 +445,8 @@ function resolvedPanel(job: JobDetail): string {
 }
 
 /** Render a RichSection {title, blocks[]} as HTML */
-function richSectionHtml(section: RichSection): string {
-  return section.markdown ? contentHtml(section.markdown) : renderToStaticMarkup(createElement(SourceBlocks, {blocks: section.blocks ?? []}));
+function richSectionHtml(section: SectionValue): string {
+  return renderToStaticMarkup(createElement(SectionContent, {value:section}));
 }
 
 function extendedPanel(
@@ -498,13 +499,7 @@ function extendedPanel(
 
     let inner = "";
     if (Array.isArray(raw) && raw.length > 0) {
-      inner = raw
-        .map((item: any) => {
-          const desc = String(item.Description ?? item.content ?? item.text ?? "");
-          return desc ? `<p class="ext-item">${esc(desc)}</p>` : "";
-        })
-        .filter(Boolean)
-        .join("\n");
+      inner = richSectionHtml(raw);
     } else if (!Array.isArray(raw) && typeof raw === "object" && (raw.blocks?.length || raw.markdown)) {
       inner = richSectionHtml(raw);
     }
@@ -553,6 +548,7 @@ function extendedPanel(
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function generateHtml(job: JobDetail, selectedIds: Set<string>): string {
+  job = resolvedDisplayJob(job);
   const versions  = job.versions ?? [];
   const generated = job.completed_at
     ? localDateTime(job.completed_at)

@@ -105,7 +105,8 @@ def source_reference(job, version, section, row):
             # Parser pages are zero based; link to the first page of the section,
             # never claim an exact row location when only section evidence exists.
             page = min(p for p in pages if isinstance(p, int) and p >= 0) + 1 if any(isinstance(p, int) and p >= 0 for p in pages) else None
-            return {'kind': 'pdf', 'url': f'/api/jobs/{job.id}/files/{index}' + (f'#page={page}' if page else ''),
+            from ..source_files import source_path
+            return {'kind': 'pdf', 'available': source_path(job,index,security.settings.uploads) is not None, 'url': f'/api/jobs/{job.id}/files/{index}' + (f'#page={page}' if page else ''),
                     'page': page, 'precision': 'section' if page else 'document', 'name': manifest[index]['name']}
     from urllib.parse import urlsplit
     sections = json.loads(job.all_data_json or '{}').get(version, {})

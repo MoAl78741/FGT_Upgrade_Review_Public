@@ -1,6 +1,7 @@
 export type JobStatus = "pending" | "running" | "completed" | "failed" | "partial" | "cancelled" | "uploading";
 
 export interface FileOutcome {
+  source_available?: boolean;
   name: string;
   status: string;
   error?: string;
@@ -32,7 +33,7 @@ export interface Job {
   processing_timeout_seconds?: number | null;
   file_outcomes?: FileOutcome[];
   warnings?: string[];
-  provenance?: {source?: string; parser_revision?: string; document_revision?: string; section_policy?: string};
+  provenance?: {documents?:{name:string;sha256:string}[]; source?: string; parser_revision?: string; document_revision?: string; section_policy?: string};
 }
 
 export interface TableItem {
