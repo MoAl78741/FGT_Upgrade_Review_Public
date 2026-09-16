@@ -59,3 +59,7 @@ deployment/caddy.json
 test-results/
 frontend/test-results/
 frontend/playwright-report/
+
+# Version-controlled release catalog (not runtime storage)
+!frontend/src/data/
+!frontend/src/data/*.json

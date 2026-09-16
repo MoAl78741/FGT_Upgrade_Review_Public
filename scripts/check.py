@@ -5,7 +5,14 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
 def fingerprint():
-    files=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','-z'],cwd=ROOT).decode().split('\0')
+    if (ROOT/'.git').exists():
+        files=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','-z'],cwd=ROOT).decode().split('\0')
+    elif (ROOT/'RELEASE-MANIFEST.json').exists():
+        files=list(json.loads((ROOT/'RELEASE-MANIFEST.json').read_text())['files'])
+    else:
+        files=[p.name for p in ROOT.iterdir() if p.is_file() and not p.name.startswith('.env') and p.suffix not in ('.db','.pdf')]
+        for tree in ('backend','fgt_upgrade','products','frontend/src','frontend/tests','scripts','tests','docs','.github'):
+            files.extend(str(p.relative_to(ROOT)) for p in (ROOT/tree).rglob('*') if p.is_file() and '__pycache__' not in p.parts and 'tests/golden/' not in str(p.relative_to(ROOT)))
     return hashlib.sha256(b''.join(n.encode()+hashlib.sha256((ROOT/n).read_bytes()).digest() for n in sorted(files) if n and (ROOT/n).is_file() and not n.startswith(('vendor/','licenses/')))).hexdigest()
 
 def main():

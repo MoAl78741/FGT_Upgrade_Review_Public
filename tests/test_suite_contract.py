@@ -74,3 +74,12 @@ def test_corpus_rejects_changed_seals_and_paths_outside_bundle(tmp_path):
     source.write_bytes(b'different source')
     with pytest.raises(ValueError,match='seal mismatch'):sealed(root,item)
     with pytest.raises(ValueError,match='stay inside'):sealed(root,dict(item,path='../outside.pdf'))
+
+
+def test_frontend_source_is_not_hidden_from_clean_checkouts():
+    import subprocess
+    if not (ROOT/'.git').exists():return  # Distributable archives intentionally omit Git metadata.
+    sources=[str(p.relative_to(ROOT)) for p in (ROOT/'frontend/src').rglob('*') if p.is_file()]
+    result=subprocess.run(['git','check-ignore','--stdin'],cwd=ROOT,input='\n'.join(sources)+'\n',text=True,capture_output=True)
+    assert result.returncode in (0,1),result.stderr
+    assert not result.stdout.strip(), 'Frontend source excluded from Git: '+result.stdout

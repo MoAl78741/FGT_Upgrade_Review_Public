@@ -1,0 +1,670 @@
+{
+  "checked_at": "2026-09-10",
+  "source": "https://docs.fortinet.com/document/fortigate/7.6.6/fortios-release-notes/760203/introduction-and-supported-models",
+  "releases": [
+    {
+      "version": "5.0.2",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.3",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.4",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.5",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.6",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.7",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.8",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.9",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.10",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.11",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.0.12",
+      "url": "https://docs.fortinet.com/document/fortigate/5.0.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.0",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.1",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.2",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.3",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.4",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.5",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.6",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.7",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.8",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.9",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.10",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.11",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.12",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.13",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.14",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.2.15",
+      "url": "https://docs.fortinet.com/document/fortigate/5.2.15/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.0",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.1",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.2",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.3",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.4",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.5",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.6",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.7",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.8",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.9",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.10",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.11",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.12",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.4.13",
+      "url": "https://docs.fortinet.com/document/fortigate/5.4.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.0",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.1",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.2",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.3",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.4",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.5",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.6",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.7",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.8",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.9",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.10",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.11",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.12",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.13",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "5.6.14",
+      "url": "https://docs.fortinet.com/document/fortigate/5.6.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.0",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.1",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.2",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.3",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.4",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.5",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.6",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.7",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.8",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.9",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.10",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.11",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.12",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.13",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.14",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.15",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.15/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.16",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.16/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.17",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.17/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.0.18",
+      "url": "https://docs.fortinet.com/document/fortigate/6.0.18/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.0",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.1",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.2",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.3",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.4",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.5",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.6",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.7",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.8",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.9",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.10",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.11",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.12",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.13",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.14",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.15",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.15/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.16",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.16/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.2.17",
+      "url": "https://docs.fortinet.com/document/fortigate/6.2.17/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.0",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.1",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.2",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.3",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.4",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.5",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.6",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.7",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.8",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.9",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.10",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.11",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.12",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.13",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.14",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.15",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.15/fortios-release-notes/760203"
+    },
+    {
+      "version": "6.4.16",
+      "url": "https://docs.fortinet.com/document/fortigate/6.4.16/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.0",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.1",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.2",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.3",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.4",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.5",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.6",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.7",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.8",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.9",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.10",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.11",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.12",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.13",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.14",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.14/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.15",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.15/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.16",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.16/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.17",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.17/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.18",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.18/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.0.19",
+      "url": "https://docs.fortinet.com/document/fortigate/7.0.19/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.0",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.1",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.2",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.3",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.4",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.5",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.6",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.7",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.8",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.9",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.10",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.11",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.12",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.2.13",
+      "url": "https://docs.fortinet.com/document/fortigate/7.2.13/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.0",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.1",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.2",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.3",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.4",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.5",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.6",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.7",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.8",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.8/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.9",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.9/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.10",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.10/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.11",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.11/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.4.12",
+      "url": "https://docs.fortinet.com/document/fortigate/7.4.12/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.0",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.0/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.1",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.1/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.2",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.2/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.3",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.3/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.4",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.4/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.5",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.5/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.6",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.6/fortios-release-notes/760203"
+    },
+    {
+      "version": "7.6.7",
+      "url": "https://docs.fortinet.com/document/fortigate/7.6.7/fortios-release-notes/760203"
+    },
+    {
+      "version": "8.0.0",
+      "url": "https://docs.fortinet.com/document/fortigate/8.0.0/fortios-release-notes/760203"
+    }
+  ]
+}
