@@ -16,7 +16,7 @@ FILES = ('Dockerfile', '.dockerignore', '.gitignore', '.gitattributes', 'docker-
          'EDITION', 'LICENSE', 'README.md', 'CHANGELOG.md', 'API_GUIDE.md', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'requirements.txt',
          'requirements.lock', 'requirements-dev.txt', 'requirements-dev-macos.in', 'requirements-dev-macos.lock',
          'requirements-runtime.constraints', 'requirements-test.lock', 'fortigate_dashboard.py',
-         'frontend/package.json', 'frontend/package-lock.json', 'frontend/index.html',
+         'AGENTS.md', 'frontend/playwright.config.cjs', 'frontend/package.json', 'frontend/package-lock.json', 'frontend/index.html',
          'frontend/tsconfig.json', 'frontend/tsconfig.node.json', 'frontend/vite.config.ts',
          'frontend/postcss.config.js', 'frontend/tailwind.config.js')
 

@@ -1357,6 +1357,17 @@
   },
   {
     "ecosystem": "npm",
+    "name": "@playwright/test",
+    "version": "1.62.1",
+    "license": "Apache-2.0",
+    "artifact": "vendor/npm/_cacache/content-v2/sha512/0d/37/1473caa28be7291efb4ec2080cb4144c8ca6475d859dc3cb32458bb6bedceeab85b1a61aaae0d7c2b3966de382fa980f2b7c37e3f8f1e7c4573f15e2ba99",
+    "notices": [
+      "licenses/npm/_playwright_test-1.62.1/package/LICENSE",
+      "licenses/npm/_playwright_test-1.62.1/package/NOTICE"
+    ]
+  },
+  {
+    "ecosystem": "npm",
     "name": "nanoid",
     "version": "3.3.18",
     "license": "MIT",
@@ -2720,6 +2731,21 @@
   },
   {
     "ecosystem": "npm",
+    "name": "playwright-core",
+    "version": "1.62.1",
+    "license": "Apache-2.0",
+    "artifact": "vendor/npm/_cacache/content-v2/sha512/c0/f6/12c0404963d187ada2125eacaab71d276b42e93b75c45fb8cd0e19ed6dec7bb73512ee42e766c3a516bb85241e078bfae10cc8d71aa1dec0367af2761957",
+    "notices": [
+      "licenses/npm/playwright-core-1.62.1/package/LICENSE",
+      "licenses/npm/playwright-core-1.62.1/package/NOTICE",
+      "licenses/npm/playwright-core-1.62.1/package/lib/serverRegistry.js.LICENSE",
+      "licenses/npm/playwright-core-1.62.1/package/lib/utilsBundle.js.LICENSE",
+      "licenses/npm/playwright-core-1.62.1/package/lib/webp_codec.LICENSE",
+      "licenses/npm/playwright-core-1.62.1/package/ThirdPartyNotices.txt"
+    ]
+  },
+  {
+    "ecosystem": "npm",
     "name": "react",
     "version": "18.3.1",
     "license": "MIT",
@@ -2806,6 +2832,16 @@
     "artifact": "vendor/npm/_cacache/content-v2/sha512/c5/e9/526b21c7dfa66013b6568658bba56df884d6cd97c3a3bf92959a4243e2105d0f7b61f137e4f6f61ab0b33e99758e6611648197f184b4a7af046be1e9524a",
     "notices": [
       "licenses/npm/is-glob-4.0.3/package/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "fsevents",
+    "version": "2.3.2",
+    "license": "MIT",
+    "artifact": "vendor/npm/_cacache/content-v2/sha512/c6/2a/8c411e3101e1d3b81f6e5a6f9f1517083a02813223813fe7978b24fb8ec8150aad5b915ca0b74d28012a3007b11db6938769a3e02adf35d8ff5a6fe0c328",
+    "notices": [
+      "licenses/npm/fsevents-2.3.2/package/LICENSE"
     ]
   },
   {
@@ -2946,6 +2982,21 @@
     "artifact": "vendor/npm/_cacache/content-v2/sha512/d0/7e/38bc38a69f9d45d18c2fc522529b47820ce25346598dd11d72061e072e3f70895d439f44285c66ef1405a3da1488b554e50a6045d61a8a948c9405514b3e",
     "notices": [
       "licenses/npm/mdast-util-to-string-4.0.0/package/license"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "playwright",
+    "version": "1.62.1",
+    "license": "Apache-2.0",
+    "artifact": "vendor/npm/_cacache/content-v2/sha512/d0/cf/8bdcb003f3f9e6e79e0b3a56bd032c748f4b66159d0505ca10ec5d55b951e933f5e9882f11703cc1401f16e7e840f0bdb64c7c442f3785fb659c533bdc2e",
+    "notices": [
+      "licenses/npm/playwright-1.62.1/package/LICENSE",
+      "licenses/npm/playwright-1.62.1/package/NOTICE",
+      "licenses/npm/playwright-1.62.1/package/lib/transform/babelBundle.js.LICENSE",
+      "licenses/npm/playwright-1.62.1/package/lib/transform/esmLoader.js.LICENSE",
+      "licenses/npm/playwright-1.62.1/package/lib/matchers/expect.js.LICENSE",
+      "licenses/npm/playwright-1.62.1/package/ThirdPartyNotices.txt"
     ]
   },
   {

@@ -1,0 +1,383 @@
+{
+  "schema": 1,
+  "features": [
+    {
+      "id": "navigation",
+      "purpose": "Find home, edition/build identity, responsive navigation and theme",
+      "backend": [
+        "tests/test_usability.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "release_selection",
+      "purpose": "Official PDF links, From/To ranges, include-start and invalid endpoints",
+      "backend": [
+        "tests/test_range_notices.py",
+        "tests/test_scrape_baseline.py",
+        "tests/test_presentation_api.py"
+      ],
+      "operations": [
+        "GET /api/releases"
+      ]
+    },
+    {
+      "id": "pdf_import",
+      "purpose": "PDF byte/file/page limits, duplicate versions, malformed/encrypted files and offline parsing",
+      "backend": [
+        "tests/test_security.py",
+        "tests/test_pdf_engine_security.py",
+        "tests/test_pdf_parser_units.py"
+      ],
+      "operations": [
+        "POST /api/jobs/upload"
+      ]
+    },
+    {
+      "id": "job_lifecycle",
+      "purpose": "Queue ownership, cancel/retry, partial outcomes, expiry and restart recovery",
+      "backend": [
+        "tests/test_security.py",
+        "tests/test_pdf_worker.py",
+        "tests/test_api_client.py"
+      ],
+      "operations": [
+        "GET /api/jobs",
+        "POST /api/jobs",
+        "DELETE /api/jobs/{job_id}",
+        "GET /api/jobs/{job_id}",
+        "POST /api/jobs/{job_id}/cancel",
+        "POST /api/jobs/{job_id}/retry",
+        "PUT /api/jobs/{job_id}/title"
+      ]
+    },
+    {
+      "id": "workers",
+      "purpose": "No-network worker policy, aggregate limits, progress rename race and isolation",
+      "backend": [
+        "tests/test_container_workers.py",
+        "tests/test_pdf_worker.py",
+        "tests/test_performance_paths.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "progress",
+      "purpose": "Per-file elapsed time, page counts, monotonic progress and terminal outcomes",
+      "backend": [
+        "tests/test_file_metrics.py",
+        "tests/test_pdf_worker.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "scraping",
+      "purpose": "Scoped content capture, requests/Selenium policy and release baselines",
+      "backend": [
+        "tests/test_scraper_html.py",
+        "tests/test_scrape_baseline.py",
+        "tests/test_fgt_utils.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "report_content",
+      "purpose": "Source text/formatting, sections, tables, headings, notices and historical aliases",
+      "backend": [
+        "tests/test_content_parity.py",
+        "tests/test_parser_generalization.py",
+        "tests/test_pdf_section_boundaries.py",
+        "tests/test_pdf_issue_markdown.py",
+        "tests/test_pdf_callouts.py",
+        "tests/test_pdf_heading_levels.py",
+        "tests/test_pdf_prose_format.py",
+        "tests/test_pdf_table_format.py",
+        "tests/test_pdf_table_lists.py",
+        "tests/test_pdf_table_continuations.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "exports",
+      "purpose": "GUI/API/HTML/print parity, source selection and script-injection safety",
+      "backend": [
+        "tests/test_presentation_api.py",
+        "tests/test_content_parity.py"
+      ],
+      "operations": [
+        "POST /api/jobs/{job_id}/export",
+        "GET /api/reviews/{review_id}/export"
+      ]
+    },
+    {
+      "id": "consolidation",
+      "purpose": "Exact-content-only deduplication, all sections, original coordinates and source immutability",
+      "backend": [
+        "tests/test_presentation_api.py"
+      ],
+      "operations": [
+        "POST /api/jobs/{job_id}/view"
+      ]
+    },
+    {
+      "id": "comparison",
+      "purpose": "Added/changed descriptions without claiming runtime feature removal",
+      "backend": [
+        "tests/test_presentation_api.py"
+      ],
+      "operations": [
+        "GET /api/jobs/{job_id}/compare"
+      ]
+    },
+    {
+      "id": "archives",
+      "purpose": "Single-snapshot JSON/HTML, hashes, missing PDFs and bounded session ZIP",
+      "backend": [
+        "tests/test_source_availability.py",
+        "tests/test_usability.py"
+      ],
+      "operations": [
+        "GET /api/jobs/{job_id}/files/{file_index}"
+      ]
+    },
+    {
+      "id": "config_analysis",
+      "purpose": "Local-only parsing, nested configuration, corrections, relevance and clearing",
+      "backend": [
+        "tests/test_presentation_api.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "reviews",
+      "purpose": "Multi-import reviews, decisions, revision conflicts, bulk changes, completion and checklists",
+      "backend": [
+        "tests/test_reviews.py",
+        "tests/test_usability.py"
+      ],
+      "operations": [
+        "GET /api/reviews",
+        "POST /api/reviews",
+        "DELETE /api/reviews/{review_id}",
+        "GET /api/reviews/{review_id}",
+        "PUT /api/reviews/{review_id}",
+        "POST /api/reviews/{review_id}/jobs",
+        "DELETE /api/reviews/{review_id}/jobs/{job_id}",
+        "PUT /api/reviews/{review_id}/decisions/{finding_id}",
+        "PUT /api/reviews/{review_id}/bulk-decisions",
+        "PUT /api/reviews/{review_id}/checklist",
+        "POST /api/reviews/{review_id}/duplicate",
+        "POST /api/reviews/{review_id}/completion"
+      ]
+    },
+    {
+      "id": "authentication",
+      "purpose": "Bootstrap password change, secure sessions, logout, throttling and authorization",
+      "backend": [
+        "tests/test_team.py",
+        "tests/test_security.py"
+      ],
+      "operations": [
+        "GET /api/auth/status",
+        "POST /api/auth/login",
+        "POST /api/auth/logout",
+        "POST /api/auth/password",
+        "GET /api/administration/status",
+        "POST /api/administration/login",
+        "POST /api/administration/logout",
+        "POST /api/administration/password",
+        "GET /api/administration/overview"
+      ]
+    },
+    {
+      "id": "workspaces",
+      "purpose": "Customer isolation, membership revocation and stale workspace tabs",
+      "backend": [
+        "tests/test_team.py",
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "POST /api/auth/workspace",
+        "POST /api/auth/workspaces",
+        "GET /api/auth/memberships",
+        "PUT /api/auth/memberships",
+        "DELETE /api/auth/memberships/{workspace_id}/{user_id}",
+        "GET /api/administration/domains",
+        "PUT /api/administration/domains/{identity}"
+      ]
+    },
+    {
+      "id": "team_accounts",
+      "purpose": "Account lifecycle, last-admin protection and password/session revocation",
+      "backend": [
+        "tests/test_team.py"
+      ],
+      "operations": [
+        "GET /api/auth/users",
+        "POST /api/auth/users",
+        "PUT /api/auth/users/{user_id}",
+        "POST /api/auth/users/{user_id}/password"
+      ]
+    },
+    {
+      "id": "custom_roles",
+      "purpose": "Granular permissions, escalation rejection and readonly domains",
+      "backend": [
+        "tests/test_administration.py",
+        "tests/test_team.py"
+      ],
+      "operations": [
+        "GET /api/administration/profiles",
+        "POST /api/administration/profiles",
+        "DELETE /api/administration/profiles/{identity}",
+        "PUT /api/administration/profiles/{identity}"
+      ]
+    },
+    {
+      "id": "backups",
+      "purpose": "Encrypted backup, restore preview/commit, tamper rejection and atomic rollback",
+      "backend": [
+        "tests/test_maintenance.py",
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "POST /api/administration/backup",
+        "POST /api/administration/restore/preview",
+        "POST /api/administration/restore/apply"
+      ]
+    },
+    {
+      "id": "certificates",
+      "purpose": "Key/certificate validation, expiry, secret redaction and activation authorization",
+      "backend": [
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "GET /api/administration/certificates",
+        "POST /api/administration/certificates",
+        "GET /api/administration/certificates/{identity}/download",
+        "POST /api/administration/certificates/{identity}/activate",
+        "DELETE /api/administration/certificates/{identity}"
+      ]
+    },
+    {
+      "id": "event_logs",
+      "purpose": "Actor attribution, privacy and installation/domain audit separation",
+      "backend": [
+        "tests/test_team.py",
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "GET /api/auth/audit",
+        "GET /api/auth/admin-audit",
+        "GET /api/administration/logs"
+      ]
+    },
+    {
+      "id": "syslog",
+      "purpose": "Local receiver delivery and newline injection protection",
+      "backend": [
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "GET /api/administration/syslog",
+        "PUT /api/administration/syslog",
+        "POST /api/administration/syslog/test"
+      ]
+    },
+    {
+      "id": "email",
+      "purpose": "Local SMTP sink, secret redaction, event outbox and retry ownership",
+      "backend": [
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "GET /api/administration/mail",
+        "PUT /api/administration/mail",
+        "POST /api/administration/mail/test",
+        "GET /api/administration/deliveries",
+        "POST /api/administration/deliveries/{identity}/retry"
+      ]
+    },
+    {
+      "id": "scheduled_reports",
+      "purpose": "Domain scoping, deadlines, deduplication and disabled schedules",
+      "backend": [
+        "tests/test_administration.py"
+      ],
+      "operations": [
+        "GET /api/administration/schedules",
+        "POST /api/administration/schedules",
+        "DELETE /api/administration/schedules/{identity}",
+        "PUT /api/administration/schedules/{identity}"
+      ]
+    },
+    {
+      "id": "support",
+      "purpose": "Diagnostics exclude private source fields and require operator access",
+      "backend": [
+        "tests/test_maintenance.py",
+        "tests/test_team.py"
+      ],
+      "operations": [
+        "GET /api/support/diagnostics"
+      ]
+    },
+    {
+      "id": "processing_settings",
+      "purpose": "Bounds, persistence, overrides, reset and permission checks",
+      "backend": [
+        "tests/test_processing_settings.py"
+      ],
+      "operations": [
+        "DELETE /api/settings/processing",
+        "GET /api/settings/processing",
+        "PUT /api/settings/processing"
+      ]
+    },
+    {
+      "id": "api_documentation",
+      "purpose": "GUI operations discoverable, multipart/binary schema and offline Swagger",
+      "backend": [
+        "tests/test_api_coverage.py",
+        "tests/test_presentation_api.py"
+      ],
+      "operations": []
+    },
+    {
+      "id": "security",
+      "purpose": "Cross-session denial, CSRF/origin/host checks, export injection and no config endpoint",
+      "backend": [
+        "tests/test_security.py",
+        "tests/test_content_parity.py",
+        "tests/test_presentation_api.py"
+      ],
+      "operations": [
+        "GET /api/health"
+      ]
+    },
+    {
+      "id": "feature_gates",
+      "purpose": "Optional module discovery and server-enforced dependency rules",
+      "backend": [
+        "tests/test_usability.py"
+      ],
+      "operations": [
+        "GET /api/capabilities"
+      ]
+    },
+    {
+      "id": "suite_infrastructure",
+      "purpose": "Coverage drift, safe test boundaries and release packaging classification",
+      "backend": [
+        "tests/test_suite_contract.py"
+      ],
+      "operations": []
+    }
+  ],
+  "separate": {
+    "test_api.py": "Legacy external-server harness: never run implicitly",
+    "test_release_packaging.py": "Release mode: recompresses vendored dependencies",
+    "test_scrape_issues.py": "Legacy live publisher probe; deterministic scraper fixtures run in the regular suite"
+  }
+}

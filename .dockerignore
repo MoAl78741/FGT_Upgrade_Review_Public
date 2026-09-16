@@ -20,3 +20,7 @@ img*.png
 tests/
 vendor/python/macos-amd64/
 vendor/base-images/
+
+test-results/
+frontend/playwright-report/
+frontend/test-results/

@@ -8,6 +8,7 @@ Run:
     python test_scrape_issues.py 7.2.8            # test a specific version
 """
 
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -24,6 +25,8 @@ class TestLiveScrapeIssuesSection(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        if os.environ.get("RUN_LEGACY_PUBLISHER_PROBE") != "1":
+            raise unittest.SkipTest("Live publisher probe excluded; use deterministic scraper fixtures")
         cls.session = requests.Session()
         cls.session.headers["User-Agent"] = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

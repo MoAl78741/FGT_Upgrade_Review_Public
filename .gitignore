@@ -54,3 +54,8 @@ work/
 
 # Operator-generated proxy configuration
 deployment/caddy.json
+
+# Automated QA artifacts and browser traces (synthetic test data only)
+test-results/
+frontend/test-results/
+frontend/playwright-report/

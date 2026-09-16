@@ -40,3 +40,7 @@ creating private reports. User-provided files do not grant redistribution rights
 Public-launch gate: review document processing, hosting terms, privacy/retention,
 trademarks, and third-party license obligations with qualified counsel. The
 software cannot guarantee legal clearance. Hosted scraping is disabled.
+
+### Regression tooling
+
+Playwright and @playwright/test 1.62.1 (Apache-2.0) are test-only dependencies. Their vendored package notices are retained under licenses/npm. Browser binaries are provisioned separately on test machines and are not included in application images. See licenses/DEPENDENCIES.json for the complete artifact inventory.

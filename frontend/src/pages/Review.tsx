@@ -63,7 +63,7 @@ function FindingCard({finding, decision, save, busy, next}: {finding: Finding; d
     <ReviewSource source={finding.source} />
     <form onSubmit={async e => {e.preventDefault();try{await save({status,note});draftState.markSaved();}catch{/* Shared error */}}} className="space-y-2 border-t border-navy-600 pt-3">
       <label className="block text-sm text-gray-400">Decision<select disabled={busy} aria-label="Decision" className={inputStyle} value={status} onChange={e => setStatus(e.target.value as DecisionStatus)}>{Object.entries(decisionLabels).map(([key, label]) => <option value={key} key={key}>{label}</option>)}</select></label>
-      <label className="block text-sm text-gray-400">Reviewer note<textarea disabled={busy} className={inputStyle} value={note} maxLength={4000} required={status === 'not_applicable'} onChange={e => setNote(e.target.value)} /></label>
+      <label className="block text-sm text-gray-400">Reviewer note<textarea aria-label="Reviewer note" disabled={busy} className={inputStyle} value={note} maxLength={4000} required={status === 'not_applicable'} onChange={e => setNote(e.target.value)} /></label>
       <button className={buttonStyle} disabled={busy}>Save decision</button><button type="button" className={buttonStyle+" ml-2"} disabled={busy} onClick={async()=>{try{await save({status,note});draftState.markSaved();next();}catch{/* Shared error */}}}>Save and next</button><span role="status" className="text-sm text-gray-400 ml-3">{busy?'Saving…':draftState.dirty?'Unsaved changes':'Saved'}</span>
       {decision?.updated_at && <span className="text-xs text-gray-500 ml-2">Saved {localDateTime(decision.updated_at)}</span>}
     </form>

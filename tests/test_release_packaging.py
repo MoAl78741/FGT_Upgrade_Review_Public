@@ -26,7 +26,7 @@ def test_edition_archives_are_complete_reproducible_and_exclude_runtime(tmp_path
             assert not any(n.endswith(('.db', '.pdf', '.pyc')) or '/node_modules/' in n or n.startswith(('uploads/', 'data/')) for n in names)
             assert not any(Path(n).name.startswith('.env') for n in names)
             assert not any(n.startswith('tests/golden/') for n in names)
-            for required in ('Dockerfile', 'requirements.lock', 'frontend/package-lock.json', 'backend/main.py', 'frontend/src/main.tsx', 'LICENSE', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'backend/maintenance.py', 'START-HERE.md', 'releases/public.env.example', 'compose.public.yml'):
+            for required in ('AGENTS.md', 'scripts/check.py', 'scripts/check_corpus.py', 'tests/feature_matrix.json', 'tests/browser_server.py', 'tests/browser/features.spec.cjs', 'frontend/playwright.config.cjs', 'docs/TESTING.md', 'Dockerfile', 'requirements.lock', 'frontend/package-lock.json', 'backend/main.py', 'frontend/src/main.tsx', 'LICENSE', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'backend/maintenance.py', 'START-HERE.md', 'releases/public.env.example', 'compose.public.yml'):
                 assert required in names
             manifest = json.load(tar.extractfile(names['RELEASE-MANIFEST.json']))
             assert manifest['edition'] == edition

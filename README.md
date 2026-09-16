@@ -84,3 +84,7 @@ For hosts without Landlock, an operator can select isolated Docker PDF workers. 
 ### Export integrity and retained sources
 
 Reports distinguish successful extraction from availability of the original PDF. Session archives include JSON/HTML from the same snapshot, available originals, and a checksum manifest that calls out missing sources and unfinished imports. Source wording and original JSON remain unchanged. See [data consistency regression checks](docs/DEVELOPMENT.md#data-consistency-regression-checks).
+
+## Regression suite
+
+Run `.venv/bin/python scripts/check.py` after changes. The suite checks both application behavior and feature/API coverage, uses disposable data, and produces concise summaries plus browser failure traces. See [testing setup, feature coverage and release checks](docs/TESTING.md).

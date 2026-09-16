@@ -1,4 +1,4 @@
-name: Security and regression checks
+name: Security and image checks
 on:
   push:
   pull_request:
@@ -24,10 +24,8 @@ jobs:
       - run: pip install --no-index --find-links vendor/python/linux-amd64 --no-deps --require-hashes -r requirements-test.lock
       - run: pip install pip-audit pip-licenses
       - run: pip-audit -r requirements.lock
-      - run: python -m pytest tests/test_api_client.py tests/test_reviews.py tests/test_team.py tests/test_administration.py tests/test_api_coverage.py tests/test_usability.py tests/test_maintenance.py tests/test_security.py tests/test_content_parity.py tests/test_pdf_parser_units.py tests/test_parser_generalization.py tests/test_pdf_section_boundaries.py tests/test_pdf_issue_markdown.py tests/test_pdf_callouts.py tests/test_pdf_heading_levels.py tests/test_pdf_prose_format.py tests/test_pdf_table_format.py tests/test_pdf_table_lists.py tests/test_pdf_table_continuations.py tests/test_range_notices.py tests/test_pdf_engine_security.py tests/test_pdf_worker.py tests/test_performance_paths.py tests/test_fgt_utils.py tests/test_scraper_html.py -q
-      - run: npm ci --offline --cache ../vendor/npm && npm audit && npm run test:content && npm run build
+      - run: npm ci --offline --cache ../vendor/npm && npm audit && npm run build
         working-directory: frontend
-      - run: python -m pytest tests/test_presentation_api.py tests/test_source_availability.py tests/test_processing_settings.py tests/test_container_workers.py -q
       - run: pip-licenses --format=json --with-urls --with-license-file --no-license-path > python-licenses.json
       - uses: actions/upload-artifact@v4
         with:
