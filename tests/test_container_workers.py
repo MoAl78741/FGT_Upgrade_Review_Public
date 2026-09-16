@@ -99,3 +99,34 @@ def test_container_health_fails_when_runner_is_unavailable(monkeypatch):
     def unavailable(*a,**kw):raise RuntimeError('Runner unavailable')
     monkeypatch.setattr(worker_transport,'request',unavailable)
     with pytest.raises(RuntimeError,match='Runner unavailable'):healthcheck.main()
+
+
+def test_reaper_tolerates_atomic_progress_rename_and_keeps_limits(tmp_path, monkeypatch):
+    import threading, time
+    from pathlib import Path
+    from types import SimpleNamespace
+    runner = Runner.__new__(Runner)
+    runner.lock = threading.RLock()
+    stage = tmp_path/'active';stage.mkdir()
+    temporary = stage/'source.progress.tmp';temporary.write_text('{}')
+    (stage/'source.pdf').write_bytes(b'%PDF-test')
+    oversized = tmp_path/'oversized';oversized.mkdir();(oversized/'result.json').write_text('{}')
+    runner.runs = {'active':{'stage':stage,'deadline':time.monotonic()+60},
+                   'large':{'stage':oversized,'deadline':time.monotonic()+60},
+                   'expired':{'stage':tmp_path/'expired','deadline':time.monotonic()-30}}
+    (tmp_path/'expired').mkdir()
+    original = Path.lstat
+    raced = []
+    def stat(path, *args, **kwargs):
+        if path == temporary and path.exists():
+            path.replace(stage/'source.progress.json');raced.append(True)
+        if path == oversized/'result.json':return SimpleNamespace(st_size=257*1024**2)
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(Path, 'lstat', stat)
+    deleted = []
+    def delete(key):deleted.append(key);runner.runs.pop(key)
+    runner.delete = delete
+    runner.reap()
+    assert raced and list(runner.runs) == ['active']
+    assert deleted == ['large','expired']
+    runner.reap()  # Subsequent supervision remains usable.

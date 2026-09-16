@@ -187,7 +187,14 @@ class Runner:
         with self.lock:
             for key, value in list(self.runs.items()):
                 # Limit aggregate writable storage too, not just each output file.
-                total = sum(p.lstat().st_size for p in value['stage'].rglob('*'))
+                total = 0
+                for path in value['stage'].rglob('*'):
+                    try:
+                        total += path.lstat().st_size
+                    except FileNotFoundError:
+                        # Parser progress is atomically renamed while we scan.
+                        # A vanished entry must not crash every active worker.
+                        continue
                 if time.monotonic() > value['deadline']+15 or total > 256*1024**2:
                     self.delete(key)
 

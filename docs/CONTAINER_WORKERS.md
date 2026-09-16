@@ -42,3 +42,7 @@ Use the normal Dockerfile for fresh offline builds. `deployment/Dockerfile.worke
 ## Verification
 
 Run `tests/test_container_workers.py` in both editions and the existing security, queue/progress and PDF regression tests. On the target host additionally verify: real PDF parsing and source parity, progress/page counts, cancellation and deadline cleanup, restart recovery, denial of network/other-job/database/socket access, read-only root and dropped capabilities, rejected arbitrary launch fields and path escapes, unchanged source PDF hashes, public ownership enforcement, and persistent reports after restart. Never use a passing health endpoint alone as proof that the parser works.
+
+### Progress update races
+
+The supervisor tolerates progress files disappearing between directory enumeration and stat, as happens during the parser's atomic progress rename. It continues checking remaining files and retains aggregate-size and deadline enforcement. Regression coverage simulates this exact race alongside oversized and expired jobs.
