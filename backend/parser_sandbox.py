@@ -23,6 +23,10 @@ def confine(job_dir: Path, read_paths: list[Path]):
         return
     if sys.platform != 'linux':
         raise RuntimeError('Isolated parsing requires Linux or macOS')
+    if os.getenv('FGT_CONTAINER_WORKER') == '1':
+        verify_container(job_dir)
+        confine_syscalls()
+        return
     libc = ctypes.CDLL(None, use_errno=True)
     if libc.prctl(38, 1, 0, 0, 0) != 0:  # PR_SET_NO_NEW_PRIVS
         raise RuntimeError('Unable to disable privilege escalation')
@@ -60,6 +64,22 @@ def confine(job_dir: Path, read_paths: list[Path]):
             raise RuntimeError('Unable to enter filesystem sandbox')
     finally:
         os.close(fd)
+    confine_syscalls()
+
+
+def verify_container(job_dir):
+    # A deployment flag alone must not silently disable filesystem isolation.
+    status = dict(line.split(':', 1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
+    root_mount = next(line.split() for line in Path('/proc/self/mounts').read_text().splitlines() if line.split()[1] == '/')
+    if (os.getuid() != 10001 or int(status['CapEff'].strip(), 16) != 0
+            or status['NoNewPrivs'].strip() != '1' or status['Seccomp'].strip() != '2'
+            or 'ro' not in root_mount[3].split(',') or job_dir != Path('/job')
+            or not Path('/.dockerenv').exists()
+            or set(p.name for p in Path('/sys/class/net').iterdir()) != {'lo'}):
+        raise RuntimeError('Container worker isolation requirements are not met')
+
+
+def confine_syscalls():
     sec = ctypes.CDLL('libseccomp.so.2')
     sec.seccomp_init.argtypes = [ctypes.c_uint32]
     sec.seccomp_init.restype = ctypes.c_void_p

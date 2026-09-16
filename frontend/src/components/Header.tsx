@@ -37,7 +37,7 @@ export default function Header() {
             to="/"
             className="text-white font-semibold text-base tracking-tight hover:text-brand-500 transition-colors"
           >
-            FortiGate Upgrade Dashboard
+            FortiGate Upgrade Review
           </Link>
           <span
             data-testid="build-info"
@@ -51,14 +51,14 @@ export default function Header() {
           >
             {caps?.version ? `v${caps.version}` : "Version unavailable"}
             {caps?.build_number && ` · ${caps.build_number === "dev" ? "Development build" : `Build ${caps.build_number}`}`}
-            {caps?.edition && ` · ${caps.edition === "public" ? "Public" : "Private"}`}
+            {caps?.edition && ` · ${caps.edition === "public" ? "Public" : "Pro"}`}
           </span>
         </div>
 
         {/* Divider */}
         <div className="h-4 w-px bg-gray-700 hidden sm:block" />
         <span className="text-xs text-gray-500 hidden sm:block tracking-wide uppercase font-medium">
-          {caps?.edition === 'public' ? 'Public · temporary sessions' : caps?.edition === 'private' ? 'Private edition' : 'Release Notes Analyzer'}
+          {caps?.edition === 'public' ? 'Public · temporary sessions' : caps?.edition === 'private' ? 'Pro edition' : 'Release Notes Analyzer'}
         </span>
 
         {/* Right-side icon cluster */}
@@ -67,6 +67,7 @@ export default function Header() {
 
         <a className="text-xs underline" href={caps?.source_code_url ?? 'https://github.com/MoAl78741/FGT_Upgrade_Review_Public'} target="_blank" rel="noreferrer">Source · AGPL</a>
 
+        {caps?.edition === 'public' && <Link to="/pro" className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white">Upgrade to Pro</Link>}
         <SettingsModal />
 
         {/* Light / Dark toggle */}
@@ -93,9 +94,10 @@ export default function Header() {
         </div>{/* end icon cluster */}
       </div>
       <nav aria-label="Main navigation" className="max-w-screen-2xl mx-auto px-4 sm:px-6 pb-3 flex flex-wrap gap-2">
-        {[{to: '/', label: 'Home', end: true}, {to: '/reviews', label: 'Upgrade reviews'},
+        {[{to: '/', label: 'Home', end: true}, {to: '/library', label: 'Reports'}, {to: '/reviews', label: 'Upgrade reviews'},
+          ...(team.user?.is_admin ? [{to: '/administration', label: 'Administration'}] : []),
           ...(team.enabled ? [{to: '/account', label: 'Account & access'}] : []),
-          ...(caps?.edition === 'private' ? [{to: '/installation', label: 'Setup & support'}] : [])
+
         ].map(item => <NavLink key={item.to} to={item.to} end={item.end}
           className={({isActive}) => `px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${isActive ? 'bg-brand-500 text-white border-brand-500' : 'text-gray-300 border-navy-600 hover:border-brand-500 hover:text-brand-500'}`}>
           {item.label}

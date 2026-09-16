@@ -5,6 +5,7 @@ services:
     ports:
       - "127.0.0.1:${HOST_PORT:-8001}:8000"
     environment:
+      PRO_UPGRADE_URL: "${PRO_UPGRADE_URL:-}"
       APP_EDITION: public
       TEAM_AUTH_ENABLED: "false"
       APP_ORIGIN: "${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN to your exact HTTPS origin}"

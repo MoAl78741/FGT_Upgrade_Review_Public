@@ -46,3 +46,4 @@ LOAD_WAIT  = 6   # seconds to wait after initial page load (bumped for Grid late
 
 # Invalidate saved scrapes when source extraction semantics change.
 CONTENT_REVISION = "7"
+PDF_PARSER_REVISION = "8-pdfplumber-pdfium"

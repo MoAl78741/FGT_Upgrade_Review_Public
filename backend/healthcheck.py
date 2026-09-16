@@ -11,6 +11,11 @@ def main():
     with urlopen(request, timeout=10) as response:
         if json.load(response).get('status') != 'ok':
             raise RuntimeError('Application is not healthy')
+    from .container_worker import enabled, socket_path
+    if enabled():
+        from .worker_transport import request as runner_request
+        if not runner_request(socket_path(), 'GET', '/health')['ok']:
+            raise RuntimeError('PDF worker service is not healthy')
 
 
 if __name__ == '__main__':

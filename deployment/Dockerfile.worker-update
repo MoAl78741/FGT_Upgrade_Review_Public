@@ -1,0 +1,10 @@
+# Offline maintenance layer. BASE_IMAGE must be the immutable image ID of the
+# matching previous edition build. Normal fresh builds still use /Dockerfile.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+COPY backend/ /app/backend/
+COPY docs/CONTAINER_WORKERS.md /app/CONTAINER_WORKERS.md
+ARG BUILD_NUMBER
+ARG BUILD_REVISION
+ENV APP_BUILD_NUMBER=${BUILD_NUMBER} APP_BUILD_REVISION=${BUILD_REVISION}
+LABEL org.opencontainers.image.revision=${BUILD_REVISION}

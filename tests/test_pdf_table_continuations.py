@@ -1,9 +1,9 @@
-import pymupdf
+from tests.pdf_factory import Document
 from backend.pdf_table_continuations import restore_table_continuations
 
 
 def test_bordered_single_row_rejoins_previous_page_table(tmp_path):
-    pdf=tmp_path/'continued.pdf';doc=pymupdf.open();page=doc.new_page()
+    pdf=tmp_path/'continued.pdf';doc=Document();page=doc.new_page()
     page.insert_text((60,700),'Previous');page.insert_text((220,700),'Value')
     page=doc.new_page()
     for left,right in [(57,206),(206,555)]:

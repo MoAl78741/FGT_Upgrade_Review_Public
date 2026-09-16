@@ -16,7 +16,7 @@ function InstallationForm({data, changed}: {data: Installation; changed: () => P
   const mutation = useMutation({mutationFn: (reset: boolean) => req<Installation>('/settings/processing', {method: reset ? 'DELETE' : 'PUT', ...(reset ? {} : {body: JSON.stringify(draft)})}), onSuccess: async result => {setDraft(result.values);setMessage('Installation settings saved. Applies to new uploads and retries.');await changed();}});
   return <form className="space-y-3 border-t border-navy-600 pt-4" onSubmit={e => {e.preventDefault();setMessage('');mutation.mutate(false);}}>
     <h3 className="font-semibold text-white">Installation settings</h3>
-    <p className="text-xs text-gray-400">Administrator controls for all private workspaces. Saved on the server and retained after restart. Running jobs keep their existing limits.</p>
+    <p className="text-xs text-gray-400">Administrator controls for all Pro domains. Saved on the server and retained after restart. Running jobs keep their existing limits.</p>
     {(Object.keys(labels) as (keyof Values)[]).map(key => <label key={key} className="block text-sm text-gray-300">{labels[key]}<input className={field} type="number" min={1} max={data.bounds[key]} step={1} required value={Number.isNaN(draft[key]) ? '' : draft[key]} disabled={mutation.isPending} onChange={e => setDraft({...draft, [key]: e.target.valueAsNumber})}/><span className="text-xs text-gray-400">Maximum {data.bounds[key]}</span></label>)}
     <p className="text-xs text-gray-400">Lower simultaneous jobs if the machine feels slow. More files or pages may need a longer timeout. Upload byte limits and storage quotas remain operator-controlled.</p>
     <div className="flex gap-3"><button className={button} disabled={mutation.isPending}>Save installation settings</button><button className="text-gray-300 underline text-sm" type="button" disabled={mutation.isPending} onClick={() => {setMessage('');mutation.mutate(true);}}>Restore deployment defaults</button></div>
@@ -25,10 +25,10 @@ function InstallationForm({data, changed}: {data: Installation; changed: () => P
   </form>;
 }
 
-export default function ProcessingSettings() {
+export default function ProcessingSettings({localOnly=false}:{localOnly?:boolean}) {
   const team = useTeam(), qc = useQueryClient();
   const caps = useQuery({queryKey: ['capabilities'], queryFn: api.capabilities});
-  const canManage = caps.data?.edition === 'private' && (!team.enabled || team.user?.is_admin);
+  const canManage = !localOnly && caps.data?.edition === 'private' && (!team.enabled || team.user?.is_admin);
   const installation = useQuery({queryKey: ['processing-settings'], queryFn: () => req<Installation>('/settings/processing'), enabled: !!canManage});
   const [timeout, setTimeout] = useState(readPdfTimeout), [message, setMessage] = useState(''), [error, setError] = useState('');
   if (!caps.data) return <p className="text-gray-400">Loading processing settings…</p>;

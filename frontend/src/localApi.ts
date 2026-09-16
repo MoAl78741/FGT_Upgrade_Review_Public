@@ -5,3 +5,5 @@ export {compareFeatures} from './utils/featureComparison';
 export {pdfReleaseRange, pdfCatalog} from './utils/pdfReleaseRange';
 export {reviewPackageHtml} from './utils/reviewExport';
 export {generateHtml, getAvailableSections} from './utils/htmlExport';
+
+export {sessionZip, ARCHIVE_LIMIT} from './utils/sessionZip';

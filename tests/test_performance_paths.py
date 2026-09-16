@@ -3,11 +3,11 @@ from threading import Barrier, Lock
 
 
 def test_cell_index_matches_pdfplumber_crops(tmp_path):
-    import pymupdf
+    from tests.pdf_factory import Document
     import pdfplumber
     from backend.pdf_parser import _CellTextIndex
     source = tmp_path / 'cells.pdf'
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page()
     for y in range(40, 700, 24):
         page.insert_text((40, y), '123456 Text with spaces, punctuation and wrapped cells.')

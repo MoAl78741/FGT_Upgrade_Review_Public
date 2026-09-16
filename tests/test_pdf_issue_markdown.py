@@ -54,9 +54,9 @@ def test_literal_html_entity_is_not_decoded_by_markdown():
 
 
 def test_embedded_table_preserves_cells_and_markdown():
-    import pymupdf
+    from tests.pdf_factory import Document
     from backend.pdf_issue_markdown import _page_lines
-    doc = pymupdf.open()
+    doc = Document()
     page = doc.new_page()
     # An issue table enclosing a two-column command table.
     for x0,y0,x1,y1 in [(50,90,550,290),(130,90,130,290),(50,115,550,115),
@@ -78,9 +78,9 @@ def test_embedded_table_preserves_cells_and_markdown():
 
 
 def test_page_number_does_not_break_cross_page_description_matching():
-    import pymupdf
+    from tests.pdf_factory import Document
     from backend.pdf_issue_markdown import _page_lines
-    doc=pymupdf.open();page=doc.new_page(width=612,height=792)
+    doc=Document();page=doc.new_page(width=612,height=792)
     page.insert_text((60,150),'1',fontsize=10)
     page.insert_text((560,750),'1',fontsize=10)
     lines=_page_lines(page,0)
@@ -107,9 +107,9 @@ def test_native_italic_and_bold_italic_are_preserved():
 
 
 def test_inline_code_with_prose_punctuation_is_not_a_code_block():
-    import pymupdf
+    from tests.pdf_factory import Document
     from backend.pdf_issue_markdown import _page_lines
-    doc = pymupdf.open();page = doc.new_page()
+    doc = Document();page = doc.new_page()
     page.insert_text((100, 100), 'accept', fontname='cour', fontsize=10)
     page.insert_text((136, 100), '.', fontname='helv', fontsize=10)
     lines = _page_lines(page, 0)

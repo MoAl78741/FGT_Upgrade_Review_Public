@@ -11,11 +11,12 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = '3.0.0'
-TREES = ('backend', 'fgt_upgrade', 'frontend/src', 'frontend/tests', 'tests', 'scripts', 'licenses', 'releases', 'docs', '.github')
-FILES = ('Dockerfile', '.dockerignore', '.gitignore', 'docker-compose.yml', 'compose.public.yml',
-         'EDITION', 'LICENSE', 'README.md', 'API_GUIDE.md', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'requirements.txt',
-         'requirements.lock', 'fortigate_dashboard.py',
-         'frontend/package.json', 'frontend/package-lock.json', 'frontend/index.html',
+TREES = ('backend', 'fgt_upgrade', 'frontend/src', 'frontend/tests', 'tests', 'scripts', 'licenses', 'releases', 'docs', 'deployment', '.github', 'vendor')
+FILES = ('Dockerfile', '.dockerignore', '.gitignore', '.gitattributes', 'docker-compose.yml', 'compose.public.yml', 'compose.administration.yml',
+         'EDITION', 'LICENSE', 'README.md', 'CHANGELOG.md', 'API_GUIDE.md', 'TEAM_INSTALLATION.md', 'OPERATIONS.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'requirements.txt',
+         'requirements.lock', 'requirements-dev.txt', 'requirements-dev-macos.in', 'requirements-dev-macos.lock',
+         'requirements-runtime.constraints', 'requirements-test.lock', 'fortigate_dashboard.py',
+         'AGENTS.md', 'frontend/playwright.config.cjs', 'frontend/package.json', 'frontend/package-lock.json', 'frontend/index.html',
          'frontend/tsconfig.json', 'frontend/tsconfig.node.json', 'frontend/vite.config.ts',
          'frontend/postcss.config.js', 'frontend/tailwind.config.js')
 
@@ -26,7 +27,11 @@ def source_files():
         paths.update(p for p in (ROOT / name).rglob('*') if p.is_file())
     for path in sorted(paths):
         rel = path.relative_to(ROOT)
+        if rel.as_posix().startswith("tests/golden/"):
+            continue
         if path.is_symlink() or any(x in rel.parts for x in ('__pycache__', '.pytest_cache', 'node_modules', 'dist')):
+            continue
+        if rel.as_posix() == 'deployment/caddy.json':
             continue
         if path.suffix in {'.pyc', '.pdf', '.db', '.log', '.tsbuildinfo'} or path.name.startswith('.env'):
             continue

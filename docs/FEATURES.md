@@ -14,7 +14,7 @@ Import PDFs, compare releases, identify potentially relevant changes, and prepar
 [![Docker Compose](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?logo=docker&logoColor=white)](../releases/PRIVATE.md)
 [![AGPL v3 or later](https://img.shields.io/badge/License-AGPL--3.0--or--later-7C3AED)](../LICENSE)
 
-**[Quick start](#quick-start) · [Features](#features) · [Editions](#two-editions-one-codebase) · [Security](#security-and-privacy) · [API](#gui-and-api) · [Documentation](#documentation)**
+**[Quick start](#quick-start) · [Features](#features) · [Editions](#two-independent-editions) · [Security](#security-and-privacy) · [API](#gui-and-api) · [Documentation](#documentation)**
 
 </div>
 
@@ -92,7 +92,7 @@ Configuration presence is not evidence of runtime use. All notes remain visible 
 - Detect conflicting edits instead of silently overwriting another reviewer's changes.
 - Export a review package that combines source evidence with clearly separated assessment.
 
-Private installations add named accounts, customer workspaces, administrator/reviewer/viewer roles, and attributable audit history.
+Pro installations add named accounts, administrative domains backed by customer workspaces, built-in and custom permission profiles, and attributable audit history. Mark reviews complete to trigger configured email notifications; editing a completed review reopens it.
 
 ### Processing you can follow and tune
 
@@ -119,28 +119,34 @@ Private administrators can tune timeout, batch size, page limits, and concurrenc
 
 </details>
 
-## Two editions, one codebase
+## Two independent editions
 
-| Capability | Private Docker edition | Public edition |
+| Capability | Pro Docker edition | Public edition |
 | --- | --- | --- |
 | Intended deployment | Local machine or controlled team LAN | Operator-hosted temporary sessions |
 | PDF import | Local, user-provided documents | User-provided documents |
 | Storage | Persistent application and upload volumes | Session-owned reports and PDFs; 24-hour expiry |
-| Identity | Named web accounts by default | Opaque cookie sessions; no named accounts |
+| Identity | Named web accounts by default | Temporary visitor cookies; separate named operator login |
 | Team access | Customer workspaces and role-based permissions | No shared library or cross-session access |
 | Scraping | Off by default; operator may enable it | Disabled server-side |
 | Selenium | Optional, trusted operator configuration | Disabled |
 | Config analysis | Browser/local memory only | Browser/local memory only |
 | Offline PDF workflow | Supported after installation | Hosted service requires connectivity |
-| Source | Same AGPL codebase | Same AGPL codebase; corresponding-source offer required |
+| Source | Independent AGPL repository and private build | Independent AGPL repository; corresponding-source offer required |
 
 Public cookies are not portable accounts. Clearing them loses access to the session's reports. Reports and original PDFs expire 24 hours after creation; retrying does not extend that period, and users may delete them sooner.
 
 **Project status:** v3 includes both deployment modes and the workflows described here. Public hosting remains subject to the open security and legal release gates documented in [SECURITY.md](../SECURITY.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).
 
+### Installation administration
+
+Both editions provide encrypted GUI/API backup and restore with validation preview, certificate upload/inspection/activation, and protected administration. Public operator backups exclude visitor reports and PDFs. Pro installations add domain metadata and read-only/archive states, custom permission profiles, local event logs, syslog, job-failure and completed-review notifications, and scheduled summary emails. SMTP starts disabled; scheduled summaries contain links and counts, not PDF attachments.
+
+See [Administration](ADMINISTRATION.md) for setup, backup boundaries, certificate renewal responsibilities and limitations. These functions use the same authenticated APIs as the GUI. The editions are independently maintained repositories with inherited shared code; fixes must be ported deliberately.
+
 ## Quick start
 
-Use the [edition README](../README.md) and [installation guide](../releases/PUBLIC.md) for this repository. The comparison above documents inherited capabilities; this repository ships the public edition by default.
+Use the [edition README](../README.md) and [installation guide](../releases/PRIVATE.md) for this repository. The comparison above documents inherited capabilities; this repository ships the Pro edition by default.
 
 ## Security and privacy
 
@@ -200,7 +206,7 @@ flowchart LR
 | --- | --- |
 | Interface | React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, and Lucide icons. |
 | API and persistence | Python 3.12, FastAPI, Pydantic, SQLAlchemy, and SQLite. |
-| Document extraction | pdfplumber for structure/tables; PyMuPDF and PyMuPDF4LLM for rich document content. |
+| Document extraction | pdfplumber/pdfminer for text, tables and typography; pypdfium2/PDFium for document structure and rendering. |
 | Processing | Persistent queue with a single dispatcher per database, bounded workers, and isolated PDF subprocesses. |
 | Presentation | Shared React/Markdown rendering for browser views and Node-backed HTML exports; local relevance annotations. |
 | Packaging | Docker Compose, separate edition configuration, locked dependencies, and complete source/install archives. |
@@ -235,6 +241,6 @@ Keep changes focused, preserve source wording and formatting, and run the releva
 
 ## License and attribution
 
-This project is licensed under **GNU AGPL v3 or later**. See [LICENSE](../LICENSE) and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the applicable terms and dependency notices. Distribution and hosted deployments must provide the required corresponding source; PyMuPDF and PyMuPDF4LLM have AGPL/commercial licensing options.
+This project is licensed under **GNU AGPL v3 or later**. See [LICENSE](../LICENSE) and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the applicable terms and dependency notices. Distribution and hosted deployments must provide the required corresponding source. The PDF pipeline has no PyMuPDF dependency.
 
 FortiGate, FortiOS, and Fortinet are trademarks of their respective owners. This is an independent project and is not affiliated with or endorsed by Fortinet. Vendor documentation retains its original copyright and terms. Uploading a PDF does not grant redistribution rights; complete the documented legal review before a public launch.

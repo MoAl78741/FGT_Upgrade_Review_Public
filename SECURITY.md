@@ -70,5 +70,20 @@ These checks support the documented LAN validation deployment. They do not appro
 
 - Complete licensing/legal/privacy review and publish the exact corresponding source and dependency notices before a hosted pilot. Publishing source/install packages does not deploy a hosted website.
 - Validate the target production kernel with `python -m backend.sandbox_check`; unsupported confinement environments fail closed. Production support is the hardened Linux Docker deployment; native macOS is for development.
-- Put any LAN private deployment behind an authenticated TLS reverse proxy. Preserve the configured Host and Origin; apply per-client request limits at the trusted proxy.
+- Put any LAN private deployment behind a TLS reverse proxy and enable the application’s named web authentication. Do not add a second browser Basic Auth prompt; installation administration requires a named administrator. Preserve the configured Host and Origin; apply per-client request limits at the trusted proxy.
 - Re-run CI and the image scan for the actual release digest. These checks are not a comprehensive penetration test.
+
+## PDF engine migration
+
+The earlier engine-specific evidence above is historical and does not describe
+the PDFium replacement image. New builds use pdfplumber/pdfminer and PDFium,
+retain the subprocess sandbox, and are built from vendored target-platform
+dependencies with networking disabled. Run `scripts/audit_pdf_dependencies.py`
+inside the final image and `python -m backend.sandbox_check`; the latter must
+still deny network and sibling-job file access. No optional legacy engine is
+installed. Re-run advisory scanning for the actual image before release.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.

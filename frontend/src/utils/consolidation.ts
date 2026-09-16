@@ -1,4 +1,5 @@
-import type { JobDetail, Notice, RichSection } from '../types';
+import type {SectionValue} from '../components/dashboard/SectionContent';
+import type { JobDetail, Notice } from '../types';
 import { sourceRowId } from './sourceRowId';
 
 /** Object-key order is irrelevant; array order, text and formatting are not. */
@@ -40,8 +41,8 @@ export function groupNotices(notices: Notice[], enabled: boolean) {
 }
 export function richGroups(job: JobDetail, key: string, enabled: boolean) {
   const entries = (job.versions ?? []).flatMap(version => {
-    const section = job.all_data?.[version]?.[key] as RichSection | undefined;
-    return section?.markdown || section?.blocks?.length ? [{version, section}] : [];
+    const section = job.all_data?.[version]?.[key] as SectionValue | undefined;
+    return section && (Array.isArray(section) ? section.length : section.markdown || section.blocks?.length) ? [{version, section}] : [];
   });
   return groupContent(entries, enabled, e => e.version, e => e.section);
 }

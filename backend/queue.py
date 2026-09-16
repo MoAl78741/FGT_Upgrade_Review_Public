@@ -17,6 +17,7 @@ from .models import ScrapeJob, BrowserSession, Review, TeamSession
 from .settings import settings
 from .processing_settings import effective, attempt
 from .file_metrics import stamp, elapsed, pending_file, finish_files
+from .container_worker import ContainerProcess
 
 ROOT = Path(__file__).resolve().parent.parent
 STOP = threading.Event()
@@ -56,7 +57,10 @@ def terminate(job_id):
     with LOCK:
         process = CHILDREN.get(job_id)
         if process and process.poll() is None:
-            os.killpg(process.pid, signal.SIGKILL)
+            if isinstance(process, ContainerProcess):
+                process.kill()
+            else:
+                os.killpg(process.pid, signal.SIGKILL)
             process.wait(timeout=10)
 
 
@@ -90,8 +94,12 @@ def parse_isolated(job_id, path, deadline):
             current = check.get(ScrapeJob, job_id)
             if not current or current.status != 'running':
                 raise RuntimeError('Job cancelled')
-        process = subprocess.Popen(command, cwd=ROOT, env=env, stdin=subprocess.DEVNULL,
-                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        from .container_worker import enabled, ContainerProcess
+        if enabled():
+            process = ContainerProcess(job_id, path, output, min(cfg.timeout, max(1, deadline-time.monotonic())), cfg.max_pages)
+        else:
+            process = subprocess.Popen(command, cwd=ROOT, env=env, stdin=subprocess.DEVNULL,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         CHILDREN[job_id] = process
     try:
         last_progress = None
@@ -147,15 +155,19 @@ def parse_isolated(job_id, path, deadline):
         terminate(job_id)
         raise RuntimeError('Processing exceeded the time limit.')
     finally:
-        with LOCK:
-            CHILDREN.pop(job_id, None)
-        output.unlink(missing_ok=True)
-        progress_path.unlink(missing_ok=True)
-        progress_path.with_suffix('.tmp').unlink(missing_ok=True)
+        try:
+            if isinstance(process, ContainerProcess):
+                process.kill()
+        finally:
+            with LOCK:
+                CHILDREN.pop(job_id, None)
+            output.unlink(missing_ok=True)
+            progress_path.unlink(missing_ok=True)
+            progress_path.with_suffix('.tmp').unlink(missing_ok=True)
 
 
 def run_pdf(job_id):
-    from fgt_upgrade.constants import CONTENT_REVISION
+    from fgt_upgrade.constants import PDF_PARSER_REVISION
     with SessionLocal() as db:
         job = db.get(ScrapeJob, job_id)
         cfg = attempt(job, effective(db, settings))
@@ -232,7 +244,7 @@ def run_pdf(job_id):
             dates = re.findall(r'\b20\d{2}-\d{2}-\d{2}\b', json.dumps(changelog))
             if dates:
                 revisions[version] = max(dates)
-        job.provenance_json = json.dumps({**json.loads(job.provenance_json or '{}'), 'source': 'pdf', 'parser_revision': CONTENT_REVISION,
+        job.provenance_json = json.dumps({**json.loads(job.provenance_json or '{}'), 'source': 'pdf', 'parser_revision': PDF_PARSER_REVISION,
             'document_revision': '; '.join(f'{v}: change log through {d}' for v, d in revisions.items()) or 'Not detected; see source change log.',
             'section_policy': 'Absent sections are not evidence of no changes.'})
         job.completed_at = datetime.utcnow()
@@ -275,6 +287,16 @@ def run_job(job_id):
                 finish_files(job, 'failed', str(exc))
                 job.status, job.error_message = 'failed', str(exc)
                 job.completed_at = datetime.utcnow()
+                db.commit()
+
+    finally:
+        from .administration import record_event
+        from .notifications import notify
+        with SessionLocal() as db:
+            job=db.get(ScrapeJob,job_id)
+            if job and job.status in ('completed','partial','failed','cancelled'):
+                record_event(db,'job.'+job.status,workspace_id=job.owner_id,target_id=job.id,severity='warning' if job.status in ('failed','partial') else 'info')
+                if job.status in ('failed','partial'):notify(db,'job.failed',job.owner_id,job.id)
                 db.commit()
 
 
@@ -327,7 +349,11 @@ def start():
         raise RuntimeError('Run one API/dispatcher process per database.')
     # Acquire the installation lease before additive migrations or any data writes.
     try:
+        from .restore_journal import recover
+        recover(DB_PATH)
         initialize_database()
+        from .container_worker import recover as recover_workers
+        recover_workers()
     except BaseException:
         LEASE.close(); LEASE = None
         raise
@@ -342,9 +368,13 @@ def start():
         clean_expired(db)
     THREAD = threading.Thread(target=dispatch, daemon=True)
     THREAD.start()
+    from . import notifications
+    notifications.start()
 
 
 def stop():
+    from . import notifications
+    notifications.stop()
     STOP.set()
     if THREAD:
         THREAD.join(timeout=5)

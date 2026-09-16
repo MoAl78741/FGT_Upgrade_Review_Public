@@ -1,6 +1,6 @@
 # Private team installation
 
-The private Docker edition enables named accounts by default. Public deployments continue to use temporary browser sessions and do not expose team administration. Native single-user development can explicitly use `TEAM_AUTH_ENABLED=false`.
+The Pro Docker edition enables named accounts by default. Public deployments continue to use temporary browser sessions and do not expose team administration. Native single-user development can explicitly use `TEAM_AUTH_ENABLED=false`.
 
 ## First administrator
 
@@ -22,15 +22,16 @@ For an operator-selected first username/password before first startup, `python -
 
 ## Customer access
 
-Sign in and open **Account & administration**. Create customer workspaces, then create named accounts and assign workspace access:
+Sign in and open **Account & access**. Create customer workspaces, then create named accounts and assign workspace access:
 
 | Role | Access |
 |---|---|
 | Installation administrator | All customers, account administration, full audit history |
 | Reviewer | Read, import, edit, export and delete within assigned workspaces |
 | Viewer | Read and export within assigned workspaces |
+| Custom access profile | Explicit report, review and audit permissions within assigned domains |
 
-Administrators have access to every workspace. Assign ordinary reviewer or viewer accounts for customer-limited access. Account creation does not send email: share the initial password through your approved secure channel and ask the user to change it from Account. There is no public registration or email recovery.
+Administrators have access to every workspace. Assign ordinary reviewer, viewer, or custom-profile memberships for customer-limited access. Create custom profiles under System administration, then assign their IDs as membership roles. Domain read-only/archived states deny writes. Custom domain profiles never grant installation administration. Account creation does not send email: share the initial password through your approved secure channel and ask the user to change it from Account. There is no public registration or email recovery.
 
 The customer selector controls the active workspace. Switching customers reloads the page. Another tab with the former workspace cannot save against the changed selection; reload that tab before continuing. Removing membership takes effect on subsequent API requests. Disabling an account, changing administrator access or resetting its password ends all its sessions. A user changing their own password keeps the current session and ends the others. At least one active administrator must remain.
 
@@ -55,3 +56,11 @@ Sessions use random HttpOnly, SameSite=Strict cookies with an eight-hour expiry,
 ## Older-build rollback
 
 Older builds cannot enforce the initial-password flag. Before rolling back, disable any account still awaiting its initial password change and revoke its sessions, or restore the complete pre-upgrade database snapshot. Do not run an older image against an active `admin` / `password` account. The supplied deployment rollback procedure disables a pending initial administrator before selecting the older image.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.
+
+## Offline dependency bundle
+
+PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.

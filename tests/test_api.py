@@ -1,19 +1,35 @@
-"""
-API integration tests for the FortiGate Upgrade Review backend.
+"""Legacy live tests: use an explicitly disposable, compatible test server only.
 
-Requires the backend to be running:
-    uvicorn backend.main:app --reload --port 8000
-
-Run with:
+RUN_LEGACY_LIVE_API=1 LEGACY_API_DISPOSABLE=1 LEGACY_API_URL=http://localhost:18000/api \
     python -m pytest tests/test_api.py -v
-    python -m pytest tests/test_api.py -v --tb=short   # less noise on failure
+Normal regression suites use isolated TestClient fixtures instead.
 """
 
 import time
+import os
 import pytest
 import requests
 
-BASE = "http://localhost:8000/api"
+# This historical integration harness must never target a user's dev server implicitly.
+BASE = os.environ.get('LEGACY_API_URL', '').rstrip('/')
+pytestmark = pytest.mark.skipif(
+    os.environ.get('RUN_LEGACY_LIVE_API') != '1' or
+    os.environ.get('LEGACY_API_DISPOSABLE') != '1' or not BASE,
+    reason='Explicit opt-in and a disposable LEGACY_API_URL are required')
+
+@pytest.fixture(autouse=True)
+def cleanup_created_jobs(monkeypatch):
+    original=requests.post
+    created=[]
+    def post(url,*args,**kwargs):
+        response=original(url,*args,**kwargs)
+        if url in {BASE+'/jobs',BASE+'/jobs/upload'} and response.status_code==201:
+            created.append(response.json()['id'])
+        return response
+    monkeypatch.setattr(requests,'post',post)
+    yield
+    for identity in created:
+        requests.delete(BASE+'/jobs/'+identity,timeout=15)
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -36,12 +52,12 @@ def _wait_for_job(job_id: str, timeout: int = 60) -> dict:
 class TestConnectivity:
     def test_docs_reachable(self):
         """FastAPI /docs page should return 200."""
-        r = requests.get("http://localhost:8000/docs")
+        r = requests.get(BASE+"/docs")
         assert r.status_code == 200
 
     def test_openapi_json(self):
         """OpenAPI schema should be valid JSON with expected title."""
-        r = requests.get("http://localhost:8000/openapi.json")
+        r = requests.get(BASE+"/openapi.json")
         assert r.status_code == 200
         data = r.json()
         assert "paths" in data

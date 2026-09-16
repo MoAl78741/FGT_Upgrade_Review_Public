@@ -25,11 +25,29 @@ def response(job, detail=False):
     result.provenance = json.loads(job.provenance_json or '{}')
     if job.source == 'pdf':
         result.processing_timeout_seconds = json.loads(job.request_json or '{}').get('processing', {}).get('timeout_seconds')
+    if detail and job.source == 'pdf':
+        from ..source_files import source_path
+        for index, item in enumerate(result.file_outcomes):
+            item['source_available'] = source_path(job, index, settings.uploads) is not None
+        missing = sum(item['source_available'] is False for item in result.file_outcomes)
+        if missing and job.status not in {'pending', 'running', 'uploading'}:
+            result.warnings.append(f'Original source PDF unavailable for {missing} file(s). Extracted content is retained.')
     if detail:
         result.versions = json.loads(job.versions_json or '[]')
         result.all_data = json.loads(job.all_data_json or '{}')
         result.special_notices = json.loads(job.special_notices_json or '[]')
     return result
+
+
+def pro_upgrade_url():
+    import os
+    from urllib.parse import urlsplit
+    value = os.getenv('PRO_UPGRADE_URL', '').strip()
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return None
+    return value if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password else None
 
 
 @router.get('/capabilities')
@@ -40,7 +58,8 @@ def capabilities(request: Request, response: Response, db: Session = Depends(get
         owner(request, response, db)
     cfg = effective(db, settings)
     return {'team_auth': settings.team_auth and not settings.public, 'version': VERSION, 'build_number': BUILD_NUMBER, 'build_revision': BUILD_REVISION,
-            'source_code_url': settings.source_code_url, 'edition': settings.edition, 'scraping': settings.scraping,
+            'source_code_url': settings.source_code_url, 'edition': settings.edition,
+            'edition_label': 'Public' if settings.public else 'Pro', 'pro_upgrade_url': pro_upgrade_url(), 'scraping': settings.scraping,
             'selenium': settings.scraping and bool(settings.grid_url), 'config_analysis': 'browser-only',
             'retention_hours': 24 if settings.public else None,
             'max_files': cfg.max_files, 'max_file_bytes': settings.file_bytes,
@@ -140,9 +159,23 @@ def source_file(job_id: str, file_index: int, db: Session = Depends(get_db), own
     if file_index < 0 or file_index >= len(files):
         raise HTTPException(404, 'Source file not found')
     item = files[file_index]
-    root = (settings.uploads / job.id).resolve()
-    path = (root / item['stored']).resolve()
-    if path.parent != root or not path.is_file() or path.suffix.lower() != '.pdf':
+    from ..source_files import source_path
+    path = source_path(job, file_index, settings.uploads)
+    if path is None:
         raise HTTPException(404, 'Source file unavailable')
     return FileResponse(path, media_type='application/pdf', filename=Path(item['name']).name,
                         content_disposition_type='inline')
+
+
+from pydantic import BaseModel, ConfigDict, Field
+
+class ReportTitle(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    title: str = Field(max_length=160)
+
+@router.put('/jobs/{job_id}/title', response_model=JobResponse, summary='Name a report without changing source content')
+def rename_report(job_id: str, data: ReportTitle, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    job = owned_job(db, job_id, owner_id)
+    job.title = data.title.strip() or None
+    db.commit()
+    return response(job)

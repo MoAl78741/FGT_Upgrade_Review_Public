@@ -10,7 +10,7 @@ pydantic>=2.0.0
 
 # ── PDF upload mode ───────────────────────────────────────────────────────────
 pdfplumber>=0.10.0
-pymupdf4llm>=0.1.17
+pypdfium2==5.13.0
 python-multipart>=0.0.9
 
 # ── Selenium mode (--selenium flag, requires Chrome + ChromeDriver) ───────────
@@ -18,3 +18,6 @@ selenium>=4.0.0
 
 # Preserve source formatting through dashboard and exports
 markdownify>=1.2.3
+
+# Encrypted installation backups, stored credentials and certificate validation
+cryptography>=43.0.0

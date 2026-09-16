@@ -68,8 +68,8 @@ def workspace_owner(request, db, *, read_only=False):
     selected = request.headers.get('x-workspace-id')
     if selected and selected != session.workspace_id:
         raise HTTPException(409, 'Workspace changed in another tab. Reload before continuing.')
-    if not read_only and request.method not in {'GET', 'HEAD', 'OPTIONS'} and role == 'viewer':
-        raise HTTPException(403, 'Viewer access does not allow changes.')
+    from .permissions import require_workspace_permission
+    require_workspace_permission(request, db, user, session.workspace_id, role)
     db.info['workspace'] = session.workspace_id
     return session.workspace_id
 
@@ -89,6 +89,8 @@ def audit(db, action, target, workspace_id=None, details=None):
     actor = db.info.get('actor')
     if not actor:
         return
+    from .administration import record_event
+    record_event(db, action, actor=actor['name'], workspace_id=workspace_id or db.info.get('workspace'), target_id=str(target))
     db.add(AuditEvent(actor_id=actor['id'], actor_name=actor['name'], action=action,
                       target_id=str(target), workspace_id=workspace_id or db.info.get('workspace'),
                       details_json=json.dumps(details or {})))

@@ -11,7 +11,7 @@
 [![Docker](https://img.shields.io/badge/Deploy-Docker-2496ED?logo=docker&logoColor=white)](releases/PUBLIC.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0--or--later-7C3AED)](LICENSE)
 
-**[Features](docs/FEATURES.md) · [Installation](releases/PUBLIC.md) · [API](API_GUIDE.md) · [Security](SECURITY.md) · [Licensing](docs/LICENSING.md)**
+**[Administration](docs/ADMINISTRATION.md) · [Changelog](CHANGELOG.md) · [Features](docs/FEATURES.md) · [Installation](releases/PUBLIC.md) · [API](API_GUIDE.md) · [Security](SECURITY.md) · [Licensing](docs/LICENSING.md)**
 
 </div>
 
@@ -19,7 +19,7 @@
 
 Bring scattered release notes into searchable reports and structured upgrade reviews. Built for network/security engineers, firewall administrators, consultants, and change reviewers who need to connect source evidence with their own assessment.
 
-User-provided PDFs only; hosted scraping is disabled. Reports and original PDFs expire after 24 hours. Sessions are isolated; there are no named accounts or shared report libraries.
+User-provided PDFs only; hosted scraping is disabled. Reports and original PDFs expire after 24 hours. Sessions are isolated; visitors have no named accounts or shared report libraries. Installation administration uses a separate named operator login.
 
 ## Review workflow
 
@@ -63,3 +63,28 @@ Read [SECURITY.md](SECURITY.md) for implemented controls, open container advisor
 ## License
 
 **AGPL-3.0-or-later**. See [LICENSE](LICENSE) and [licensing rationale](docs/LICENSING.md). Commercial use is permitted subject to the license; repository visibility does not replace source-sharing obligations. This independent project is not affiliated with or endorsed by Fortinet. Vendor documents retain their own copyrights and terms.
+
+## System administration
+
+Installation operators can download encrypted settings backups, preview and apply restores, and upload, inspect or activate HTTPS certificates. Visitor reports and PDFs are excluded from public backups. See the [administration guide](docs/ADMINISTRATION.md) for operator provisioning and recovery. All administration actions are available through the [API](API_GUIDE.md).
+
+## Current workflow
+
+Start with an upload or the synthetic example, then use the report library to search and name your work. Review drafts have navigation protection; selected findings support previewed bulk decisions. Export previews and downloadable session archives help you verify and retain results. See [the changelog](CHANGELOG.md) and [API guide](API_GUIDE.md).
+
+## Offline dependency bundle
+
+PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.
+
+### Export integrity and retained sources
+
+Reports distinguish successful extraction from availability of the original PDF. Session archives include JSON/HTML from the same snapshot, available originals, and a checksum manifest that calls out missing sources and unfinished imports. Source wording and original JSON remain unchanged. See [data consistency regression checks](docs/DEVELOPMENT.md#data-consistency-regression-checks).
+
+## Regression suite
+
+Run `.venv/bin/python scripts/check.py` after changes. The suite checks both application behavior and feature/API coverage, uses disposable data, and produces concise summaries plus browser failure traces. See [testing setup, feature coverage and release checks](docs/TESTING.md).

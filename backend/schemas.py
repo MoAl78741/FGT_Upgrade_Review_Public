@@ -14,6 +14,7 @@ class CreateJobRequest(BaseModel):
 
 
 class JobResponse(BaseModel):
+    title: str | None = None
     id: str
     from_version: str
     to_version: str

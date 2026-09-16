@@ -39,8 +39,8 @@ def _single_rows(page, number):
 
 
 def restore_table_continuations(pdf_path, data, section_pages):
-    import pymupdf
-    with pymupdf.open(pdf_path) as doc:
+    from .pdf_document import open_document, Rect
+    with open_document(pdf_path) as doc:
         pages = _native_section_pages(doc, data, section_pages)
         cache = {}
         previous_cache = {}

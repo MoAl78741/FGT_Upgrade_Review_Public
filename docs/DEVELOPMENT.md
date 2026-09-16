@@ -33,6 +33,8 @@ Local development defaults to a Development build identity. Runtime data and upl
 | Path | Responsibility |
 | --- | --- |
 | `backend/` | API, ownership/authentication, persistence, job dispatch, parser isolation, reviews, and maintenance. |
+| `backend/administration.py`, `permissions.py`, `notifications.py` | Operator authentication, domain permissions, event forwarding and mail delivery. |
+| `backend/installation_archive.py`, `restore_journal.py`, `certificates.py` | Encrypted backups, interrupted-restore recovery and HTTPS certificate integration. |
 | `backend/routers/` | HTTP endpoints and request-level access checks. |
 | `backend/pdf_parser.py` | PDF structure and rich-content extraction. |
 | `fgt_upgrade/` | Documentation scraping and shared extraction helpers. |
@@ -64,7 +66,7 @@ A focused source-fidelity and presentation check:
 For security, accounts, reviews, and packaging changes:
 
 ```sh
-.venv/bin/python -m pytest tests/test_security.py tests/test_team.py tests/test_reviews.py tests/test_maintenance.py tests/test_release_packaging.py -q
+.venv/bin/python -m pytest tests/test_api_coverage.py tests/test_administration.py tests/test_security.py tests/test_team.py tests/test_reviews.py tests/test_maintenance.py tests/test_release_packaging.py -q
 ```
 
 The [CI workflow](../.github/workflows/security.yml) is the maintained list of automated release checks, including dependency and container scans. Some legacy tools/tests expect a live application or local documents; use the named regression suites rather than assuming every historical script is an isolated unit test.
@@ -136,3 +138,13 @@ The original command-line dashboard remains available for compatibility:
 ```
 
 Its scraping behavior is local operator tooling. Prefer the current web/API workflow for edition controls, persistent jobs, team reviews, and current exports. Evaluate source-document terms before collecting documentation.
+
+## Data consistency regression checks
+
+Run `node frontend/tests/run-content-parity.cjs` and the Python test suite before releasing. The shared screen/export renderer must retain both legacy `resolved-issue` and current `resolved-issues` content without changing stored source JSON. Generic row chapters retain identifiers and Markdown in normal and consolidated views. Archive tests verify single-snapshot JSON/HTML, attachment hashes, unavailable attachments, and authorization failures.
+
+The legacy live harness is disabled by default. It requires all three explicit settings: `RUN_LEGACY_LIVE_API=1`, `LEGACY_API_DISPOSABLE=1`, and `LEGACY_API_URL=http://<disposable-test-server>/api`. Never point it at a development or production installation with retained reports. Tests create jobs and clean up their own IDs. Normal tests use isolated databases and clients.
+
+Detailed PDF job responses include `file_outcomes[].source_available`. PDF review references include `available`. These describe retained attachment availability, independently of successful extraction. Missing originals add response warnings without modifying saved extraction/provenance.
+
+Session ZIP exports use one response snapshot for each JSON/HTML pair, preserve available original PDFs, validate recorded PDF SHA-256 hashes, and include a `manifest.json` of entry hashes and warnings. Missing originals do not discard extracted reports. Authentication failures or checksum mismatches stop the archive. Archives with partial/unfinished reports or missing originals are explicitly marked incomplete. They are personal exports, not installation restore backups.

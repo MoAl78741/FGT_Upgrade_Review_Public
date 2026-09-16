@@ -75,7 +75,7 @@ def owned_review(db, review_id, owner_id):
 
 def metadata(review):
     fields = ['id', 'title', 'customer', 'site', 'prepared_by', 'summary', 'rollback_notes',
-              'revision', 'created_at', 'updated_at', 'expires_at', 'range_from', 'range_to', 'range_include_from']
+              'completed_at', 'revision', 'created_at', 'updated_at', 'expires_at', 'range_from', 'range_to', 'range_include_from']
     data = {field: getattr(review, field) for field in fields}
     for field in ['expected_versions', 'job_ids', 'decisions', 'checklist']:
         data[field] = json.loads(getattr(review, field + '_json'))
@@ -105,7 +105,8 @@ def source_reference(job, version, section, row):
             # Parser pages are zero based; link to the first page of the section,
             # never claim an exact row location when only section evidence exists.
             page = min(p for p in pages if isinstance(p, int) and p >= 0) + 1 if any(isinstance(p, int) and p >= 0 for p in pages) else None
-            return {'kind': 'pdf', 'url': f'/api/jobs/{job.id}/files/{index}' + (f'#page={page}' if page else ''),
+            from ..source_files import source_path
+            return {'kind': 'pdf', 'available': source_path(job,index,security.settings.uploads) is not None, 'url': f'/api/jobs/{job.id}/files/{index}' + (f'#page={page}' if page else ''),
                     'page': page, 'precision': 'section' if page else 'document', 'name': manifest[index]['name']}
     from urllib.parse import urlsplit
     sections = json.loads(job.all_data_json or '{}').get(version, {})
@@ -155,6 +156,7 @@ def detail(db, review, owner_id):
 
 
 def save(db, review, revision, **values):
+    if 'completed_at' not in values: values['completed_at'] = None
     result = db.execute(update(Review).where(Review.id == review.id, Review.revision == revision)
                         .values(**values, revision=revision + 1, updated_at=datetime.utcnow()))
     if result.rowcount != 1:
@@ -267,6 +269,27 @@ def decide(review_id: str, finding_id: str, data: DecisionInput, db: Session = D
     return metadata(review)
 
 
+class BulkDecisionInput(DecisionInput):
+    finding_ids: list[str] = Field(min_length=1, max_length=100)
+
+
+@router.put('/{review_id}/bulk-decisions', summary='Apply one decision to explicitly selected findings atomically')
+def bulk_decide(review_id: str, data: BulkDecisionInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    review = owned_review(db, review_id, owner_id)
+    jobs, _ = content(db, review, owner_id)
+    available = {f['id'] for f in findings(jobs)}
+    if not set(data.finding_ids) <= available:
+        raise HTTPException(404, 'A selected finding is unavailable. Reload the review.')
+    if data.status == 'not_applicable' and not data.note.strip():
+        raise HTTPException(422, 'Explain why the selected findings are not applicable.')
+    decisions = json.loads(review.decisions_json)
+    value = data.model_dump(exclude={'revision', 'finding_ids'}) | {'updated_at': datetime.utcnow().isoformat(), 'reviewed_by': db.info.get('actor', {}).get('name')}
+    for identity in set(data.finding_ids):
+        decisions[identity] = value
+    save(db, review, data.revision, decisions_json=json.dumps(decisions))
+    return metadata(review)
+
+
 @router.put('/{review_id}/checklist')
 def checklist(review_id: str, data: ChecklistInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
     review = owned_review(db, review_id, owner_id)
@@ -289,3 +312,25 @@ def delete_review(review_id: str, db: Session = Depends(get_db), owner_id=Depend
     db.delete(owned_review(db, review_id, owner_id))
     team.audit(db, 'review.deleted', review_id, workspace_id=owner_id)
     db.commit()
+
+
+class CompletionInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    revision: int = Field(ge=1)
+    completed: bool
+
+@router.post('/{review_id}/completion')
+def set_completion(review_id: str, data: CompletionInput, db: Session = Depends(get_db), owner_id=Depends(owner)):
+    review=owned_review(db,review_id,owner_id)
+    if data.completed and review.completed_at:
+        if review.revision!=data.revision:raise HTTPException(409,'Review changed; reload before continuing.')
+        return metadata(review)
+    # Completion and queued notification commit together with the same revision guard.
+    result=db.execute(update(Review).where(Review.id==review.id,Review.revision==data.revision).values(
+        completed_at=datetime.utcnow() if data.completed else None,revision=data.revision+1,updated_at=datetime.utcnow()))
+    if result.rowcount!=1:db.rollback();raise HTTPException(409,'Review changed; reload before continuing.')
+    team.audit(db,'review.completed' if data.completed else 'review.reopened',review.id,workspace_id=owner_id)
+    if data.completed:
+        from ..notifications import notify
+        notify(db,'review.completed',owner_id,review.id)
+    db.commit();db.refresh(review);return metadata(review)

@@ -1,10 +1,12 @@
-# Private installation, backup, restore and upgrade
+# Installation operations and recovery
+
+Choose the encrypted **GUI/API backup** in [System administration](docs/ADMINISTRATION.md) for ordinary recovery. The **offline private CLI archive** below covers the database and uploads only; it does not include the separate `/system` administration volume or proxy configuration/CA volumes. Back up those operator-controlled volumes and Compose configuration separately for full offline disaster recovery. Public backups must exclude visitor content.
 
 Use the supported hardened Docker deployment for production. The default Compose installation binds only to localhost; LAN access requires TLS and authenticated access. See [team setup](TEAM_INSTALLATION.md) for individual accounts. The app's **Setup & support** page provides the checklist and a previewable diagnostic download.
 
 ## Backup
 
-Back up before upgrading and regularly according to your recovery needs. This release supplies an on-demand tool; it does not schedule or upload backups. Archives contain full source PDFs, reviewer notes, account password hashes and audit history. Keep them encrypted at rest using your organization's storage controls, restrict access, and test recovery. The ZIP format itself is not encryption.
+Back up before upgrading and regularly according to your recovery needs. The offline CLI described below supplies an on-demand ZIP tool. The separate GUI/API workflow creates encrypted archives; see [System administration](docs/ADMINISTRATION.md). Neither workflow schedules backups. Archives contain full source PDFs, reviewer notes, account password hashes and audit history. Keep them encrypted at rest using your organization's storage controls, restrict access, and test recovery. The ZIP format itself is not encryption.
 
 1. Stop the application container, leaving the database and uploads volumes intact. Never run two application instances against the same volumes.
 2. Mount an operator-controlled backup directory writable by container UID 10001. Do not expose it through the web proxy or commit it to source control. On Linux, provision that directory with ownership `10001:10001` and mode `0700`; on Docker Desktop, ensure the bind mount permits the container user to write.
@@ -19,7 +21,7 @@ docker compose start fgt-upgrade
 
 The backup command holds the application's database lease and refuses to run while its API/dispatcher is active. It makes a consistent SQLite snapshot, checks database integrity, and includes upload files with SHA-256 checksums in an archive manifest. Output is owner-only and existing archives are never overwritten. Use a distinct archive name for each backup. A failed backup is not a recovery point; inspect the error and retain the current installation.
 
-For a native development installation, set `DB_PATH` and `UPLOADS_DIR` to the intended installation and run `python -m backend.maintenance backup /path/to/archive.zip` while its API is stopped. Public-edition backup and restore are disabled to preserve the temporary-session operating model.
+For a native development installation, set `DB_PATH` and `UPLOADS_DIR` to the intended installation and run `python -m backend.maintenance backup /path/to/archive.zip` while its API is stopped. The offline database/PDF archive commands are disabled in the public edition. Public operators can use encrypted GUI/API settings-and-certificate backups, which exclude visitor data.
 
 ## Restore drill and upgrade
 
@@ -60,3 +62,16 @@ DB_PATH=/path/to/empty/data/restored.db UPLOADS_DIR=/path/to/empty/uploads \
 Private installation administrators can open **Setup & support → Preview diagnostics**, review every field, then download the JSON. The tool includes the app/build revision, OS family, Python version, configured processing limits, known table availability and counts by known job status. It excludes filesystem paths, hostnames, customer/account identifiers, source text, filenames, uploaded configurations, extracted feature profiles and logs. There is no automatic submission to support.
 
 Operators can also run `python -m backend.maintenance diagnostics`. Treat full database archives and application logs as confidential; they are not diagnostic files and must not be attached casually to support requests.
+
+## System administration
+
+See the [administration guide](docs/ADMINISTRATION.md) for GUI encrypted backup/restore, certificate management, public operator access, and private domain profiles, syslog, email notifications and scheduled summaries. These operations are also exposed in Swagger.
+
+## Offline dependency bundle
+
+PDF imports use pdfplumber/pdfminer and PDFium. See [the offline build guide](docs/OFFLINE_BUILD.md) for the vendored Linux AMD64 build, Intel Mac development environment, dependency notices and engine-exclusion checks.
+
+
+## Photon OS and container PDF workers
+
+For hosts without Landlock, an operator can select isolated Docker PDF workers. The API never receives the Docker socket, and existing upload/progress/cancel/export APIs are unchanged. See [Container worker deployment and security](docs/CONTAINER_WORKERS.md) for configuration, limits, recovery and verification.

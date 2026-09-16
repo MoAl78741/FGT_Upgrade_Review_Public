@@ -1,5 +1,6 @@
 """Session ownership and browser request isolation, shared by every API route."""
 import hashlib
+import re
 import secrets
 import time
 from collections import OrderedDict
@@ -79,11 +80,31 @@ class RequestSecurity:
         mutation = scope['method'] not in {'GET', 'HEAD', 'OPTIONS'}
         if host not in allowed:
             return await JSONResponse({'detail': 'Untrusted host'}, 400)(scope, receive, send)
-        if (origin and origin not in settings.origins) or (mutation and (settings.public or settings.team_auth) and origin not in settings.origins):
+        if (origin and origin not in settings.origins) or (mutation and (settings.public or settings.team_auth or scope['path'].startswith('/api/administration')) and origin not in settings.origins):
             return await JSONResponse({'detail': 'Untrusted origin'}, 403)(scope, receive, send)
         if mutation and headers.get(b'sec-fetch-site') == b'cross-site':
             return await JSONResponse({'detail': 'Cross-site request denied'}, 403)(scope, receive, send)
+        # Authenticate management uploads before multipart parsing can spool large bodies.
+        if mutation and (scope['path'].startswith('/api/administration/restore/') or scope['path'] == '/api/administration/certificates'):
+            from starlette.requests import Request
+            from starlette.concurrency import run_in_threadpool
+            from .administration import authorize
+            from .main import app as application
+            from .database import get_db
+            provider = application.dependency_overrides.get(get_db, get_db)
+            def check_operator():
+                iterator = provider()
+                db = next(iterator)
+                try: authorize(Request(scope), db)
+                finally: iterator.close()
+            try: await run_in_threadpool(check_operator)
+            except HTTPException as exc:
+                return await JSONResponse({'detail': exc.detail}, exc.status_code)(scope, receive, send)
         limit = settings.total_bytes + 1024**2 if scope['path'] == '/api/jobs/upload' else 64 * 1024
+        if scope['path'].startswith('/api/administration/restore/'):
+            limit = 257 * 1024**2
+        elif scope['path'] == '/api/administration/certificates':
+            limit = 384 * 1024
         try:
             length = int(headers.get(b'content-length', b'0'))
         except ValueError:
@@ -100,12 +121,16 @@ class RequestSecurity:
             return message
         async def secure_send(message):
             if message['type'] == 'http.response.start':
+                source_pdf = bool(re.fullmatch(r'/api/jobs/[^/]+/files/\d+', scope.get('path', '')))
+                policy = b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+                if source_pdf:
+                    policy = policy.replace(b"frame-ancestors 'none'", b"frame-ancestors 'self'")
                 message.setdefault('headers', []).extend([
                     (b'x-content-type-options', b'nosniff'),
                     (b'referrer-policy', b'no-referrer'),
-                    (b'x-frame-options', b'DENY'),
+                    (b'x-frame-options', b'SAMEORIGIN' if source_pdf else b'DENY'),
                     (b'cache-control', b'no-store'),
-                    (b'content-security-policy', b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws://localhost:5173 ws://127.0.0.1:5173; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")])
+                    (b'content-security-policy', policy)])
             await send(message)
         await self.app(scope, bounded_receive, secure_send)
 

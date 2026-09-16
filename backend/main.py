@@ -31,6 +31,8 @@ async def lifespan(app):
 
 app = FastAPI(title="Release Note Review API", version=VERSION, lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url="/api/openapi.json")
 app.add_middleware(RequestSecurity)
+from .maintenance_gate import MaintenanceGate
+app.add_middleware(MaintenanceGate)
 from .api_docs import router as docs_router, configure_schema
 app.include_router(docs_router)
 configure_schema(app)
@@ -47,6 +49,9 @@ app.include_router(support_router)
 app.include_router(processing_router)
 from .routers.presentation import router as presentation_router
 app.include_router(presentation_router)
+
+from .routers.administration import router as administration_router
+app.include_router(administration_router)
 
 # Serve built React frontend if present
 _frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"

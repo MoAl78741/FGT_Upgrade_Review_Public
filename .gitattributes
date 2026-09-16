@@ -1,0 +1,3 @@
+vendor/** binary
+vendor/MANIFEST.json text diff
+licenses/** -text

@@ -3,7 +3,7 @@ import {reportView, reportHtml} from '../src/utils/reportApi';
 import {generateHtml, getAvailableSections} from '../src/utils/htmlExport';
 import type {JobDetail} from '../src/types';
 const row={'Bug ID':'1',Description:'Unchanged **source**',markdown:'Unchanged **source**'};
-const job:JobDetail={id:'source',from_version:'7.6.5',to_version:'7.6.6',status:'completed',use_selenium:false,created_at:'2026-09-11',versions:['7.6.5','7.6.6'],all_data:{'7.6.5':{known_issues:[{...row,category:'System'}]},'7.6.6':{known_issues:[{...row,category:'System'}]}}};
+const job:JobDetail={id:'source',from_version:'7.6.5',to_version:'7.6.6',status:'completed',use_selenium:false,created_at:'2026-09-11',completed_at:'2026-09-11T12:00:00Z',versions:['7.6.5','7.6.6'],all_data:{'7.6.5':{known_issues:[{...row,category:'System'}]},'7.6.6':{known_issues:[{...row,category:'System'}]}}};
 assert.equal(reportHtml(job),generateHtml(job,new Set(getAvailableSections(job).map(s=>s.id))), 'HTTP renderer defaults match the GUI export');
 assert.equal(reportView(job).count,2);
 const options={consolidate_all:true};
